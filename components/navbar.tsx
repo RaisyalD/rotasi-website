@@ -41,7 +41,7 @@ export function Navbar() {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi.jpg-WzsprUfnVlIPqWrUG49J5kjH7LPv2c.jpeg"
+              src="/rotasi logo.png"
               alt="ROTASI Logo"
               width={40}
               height={40}
@@ -86,9 +86,25 @@ export function Navbar() {
                 </div>
               </div>
             </div>
-            <Button asChild variant="default" className="bg-maroon hover:bg-maroon-light">
-              <Link href="/pendaftaran">Daftar Sekarang</Link>
-            </Button>
+            <div className="relative group">
+              <Button variant="outline" className="flex items-center gap-2">
+                Daftar
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+              <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="py-1">
+                  <Link href="/auth/register-divisi" className="block px-4 py-2 text-sm hover:bg-accent">
+                    Register Divisi
+                  </Link>
+                  <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-accent">
+                    Login Divisi
+                  </Link>
+                  <Link href="/auth/daftar-peserta" className="block px-4 py-2 text-sm hover:bg-accent">
+                    Daftar Peserta
+                  </Link>
+                </div>
+              </div>
+            </div>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -112,11 +128,18 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Button asChild variant="default" className="mt-2 bg-maroon hover:bg-maroon-light">
-              <Link href="/pendaftaran" onClick={() => setIsOpen(false)}>
-                Daftar Sekarang
+            <div className="border-t border-border/50 pt-2 mt-2">
+              <p className="text-xs font-semibold mb-1 text-foreground/60">Daftar</p>
+              <Link href="/auth/register-divisi" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                Register Divisi
               </Link>
-            </Button>
+              <Link href="/auth/login" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                Login Divisi
+              </Link>
+              <Link href="/auth/daftar-peserta" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                Daftar Peserta
+              </Link>
+            </div>
           </div>
         </nav>
       )}

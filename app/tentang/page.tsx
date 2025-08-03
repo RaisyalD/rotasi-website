@@ -15,7 +15,7 @@ export default function TentangPage() {
             <div className="flex flex-col md:flex-row gap-8 items-center mb-12">
               <div className="md:w-1/3 flex justify-center">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi.jpg-WzsprUfnVlIPqWrUG49J5kjH7LPv2c.jpeg"
+                  src="/rotasi logo.png"
                   alt="ROTASI Logo"
                   width={200}
                   height={200}
@@ -25,7 +25,7 @@ export default function TentangPage() {
               <div className="md:w-2/3">
                 <p className="text-lg mb-4">
                   ROTASI (Regenerasi dan Orientasi Mahasiswa PSTI) adalah program kaderisasi yang diselenggarakan oleh
-                  Himpunan Mahasiswa Pendidikan Sistem dan Teknologi Informasi (HIMA PSTI) Universitas Pendidikan
+                  Departemen Pengembangan Sumber Daya Organisasi (PSDO) Himpunan Mahasiswa Pendidikan Sistem dan Teknologi Informasi (HIMA PSTI) Universitas Pendidikan
                   Indonesia.
                 </p>
                 <p className="text-muted-foreground">
@@ -47,6 +47,7 @@ export default function TentangPage() {
 
             <div className="prose prose-invert max-w-none">
               <p>
+                Dari awal tahun Prodi PSTI berdiri yaitu tahun 2018, Awal mula nama kaderisasi ini adalah Masa Pengenalan Prodi PSTI (MANPRO PSTI) dan diubah menjadi ROTASI pada tahun 2023.
                 ROTASI (Regenerasi dan Orientasi Mahasiswa PSTI) adalah program kaderisasi yang diselenggarakan untuk
                 mahasiswa baru prodi PSTI UPI. Program ini dirancang untuk memperkenalkan mahasiswa baru dengan
                 lingkungan kampus, program studi, dan nilai-nilai yang dijunjung tinggi oleh PSTI UPI.
@@ -87,26 +88,10 @@ export default function TentangPage() {
                     <div className="bg-primary/20 p-3 rounded-full">
                       <Shield className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold">Loyalitas</h3>
+                    <h3 className="text-xl font-bold">Inisiatif</h3>
                   </div>
                   <p className="text-muted-foreground">
-                    Kesetiaan terhadap program studi, almamater, dan negara. Mahasiswa PSTI diharapkan memiliki rasa
-                    memiliki dan bangga terhadap institusi yang menaunginya.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-border/50">
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="bg-primary/20 p-3 rounded-full">
-                      <Lightbulb className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold">Progresivitas</h3>
-                  </div>
-                  <p className="text-muted-foreground">
-                    Semangat untuk terus berkembang dan berinovasi. Mahasiswa PSTI didorong untuk memiliki pemikiran
-                    maju dan tidak takut menghadapi perubahan.
+                    Kemampuan untuk proaktif, berani mengambil tindakan, dan mencari solusi tanpa menunggu perintah. Mahasiswa PSTI diharapkan mampu memulai perubahan positif di lingkungan sekitarnya.
                   </p>
                 </CardContent>
               </Card>
@@ -120,8 +105,21 @@ export default function TentangPage() {
                     <h3 className="text-xl font-bold">Tangguh</h3>
                   </div>
                   <p className="text-muted-foreground">
-                    Kemampuan untuk bertahan dan berkembang dalam situasi sulit. Mahasiswa PSTI dilatih untuk memiliki
-                    ketahanan mental dan fisik dalam menghadapi berbagai tantangan.
+                    Ketahanan mental dan fisik dalam menghadapi tantangan, serta tidak mudah menyerah. Mahasiswa PSTI dilatih untuk tetap tegar dan beradaptasi dalam berbagai situasi.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-primary/20 p-3 rounded-full">
+                      <Lightbulb className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold">Beretika</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Menjunjung tinggi nilai moral, sopan santun, dan integritas dalam setiap tindakan. Mahasiswa PSTI diharapkan mampu bersikap jujur, adil, dan bertanggung jawab.
                   </p>
                 </CardContent>
               </Card>
@@ -132,11 +130,24 @@ export default function TentangPage() {
                     <div className="bg-primary/20 p-3 rounded-full">
                       <Heart className="h-6 w-6 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold">Solidaritas</h3>
+                    <h3 className="text-xl font-bold">Inovatif</h3>
                   </div>
                   <p className="text-muted-foreground">
-                    Rasa kebersamaan dan kepedulian. Mahasiswa PSTI diharapkan dapat saling mendukung dan membantu,
-                    serta memiliki kepekaan terhadap isu-isu sosial.
+                    Kreatif dalam berpikir dan berani mencoba hal baru untuk menciptakan perubahan yang lebih baik. Mahasiswa PSTI didorong untuk selalu mencari ide-ide segar dan solusi inovatif.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/50">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-primary/20 p-3 rounded-full">
+                      <Users className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold">Kooperatif</h3>
+                  </div>
+                  <p className="text-muted-foreground">
+                    Mampu bekerja sama, menghargai pendapat, dan membangun kolaborasi yang harmonis dengan sesama mahasiswa maupun pihak lain untuk mencapai tujuan bersama.
                   </p>
                 </CardContent>
               </Card>

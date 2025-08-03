@@ -51,25 +51,25 @@ export default function GaleriPage() {
     {
       name: "Fahri Bintang",
       angkatan: "2024",
-      photo: "/placeholder.svg?height=200&width=200",
+      photo: "/fahri.png",
       text: "ROTASI memberikan saya pengalaman yang luar biasa. Saya belajar banyak tentang kerja tim, kepemimpinan, dan nilai-nilai PSTI yang akan saya bawa sepanjang perkuliahan.",
     },
     {
       name: "Putri Apriyanti",
       angkatan: "2024",
-      photo: "/placeholder.svg?height=200&width=200",
+      photo: "/putri.png",
       text: "Melalui ROTASI, saya menemukan keluarga baru di PSTI. Kegiatan ini membentuk karakter saya dan mempersiapkan saya menghadapi tantangan perkuliahan dengan lebih baik.",
     },
     {
       name: "Ariestama Putra",
       angkatan: "2023",
-      photo: "/placeholder.svg?height=200&width=200",
+      photo: "/ariestama.png",
       text: "Awalnya saya ragu mengikuti ROTASI, tapi ternyata ini adalah keputusan terbaik. Saya mendapatkan banyak pengetahuan dan keterampilan yang tidak bisa didapatkan di kelas.",
     },
     {
       name: "Rheindy Ari Laksono",
       angkatan: "2023",
-      photo: "/placeholder.svg?height=200&width=200",
+      photo: "/reindy.png",
       text: "ROTASI adalah pengalaman yang tak terlupakan. Selain mendapatkan teman baru, saya juga belajar tentang nilai-nilai penting yang membentuk jati diri mahasiswa PSTI.",
     },
   ]
@@ -162,9 +162,16 @@ export default function GaleriPage() {
             <Separator className="w-24 h-1 bg-primary mx-auto mb-12" />
 
             <div className="aspect-video bg-card border border-border/50 rounded-lg overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center">
-                <p className="text-muted-foreground">Video highlight ROTASI akan ditampilkan di sini</p>
-              </div>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/qmns3AoVJUE?si=_k4m5LfPnZytdVQa"
+                title="After Movie ROTASI 2024"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
             </div>
 
             <div className="mt-8 text-center">

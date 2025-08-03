@@ -11,12 +11,21 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 brightness-50"
+        >
+          <source src="/logo.mp4" type="video/mp4" />
+        </video>
         <div className="absolute inset-0 hero-gradient"></div>
         <div className="container mx-auto px-4 py-12 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-6 flex justify-center">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi.jpg-WzsprUfnVlIPqWrUG49J5kjH7LPv2c.jpeg"
+                src="/rotasi logo.png"
                 alt="ROTASI Logo"
                 width={150}
                 height={150}
@@ -78,9 +87,9 @@ export default function Home() {
                     <Users className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold">Loyalitas</h3>
+                    <h3 className="font-bold">Inisiatif</h3>
                     <p className="text-sm text-muted-foreground">
-                      Membangun kesetiaan terhadap program studi dan almamater
+                    Mahasiswa PSTI diharapkan mampu memulai perubahan positif di lingkungan sekitarnya.
                     </p>
                   </div>
                 </div>
@@ -89,8 +98,10 @@ export default function Home() {
                     <Award className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold">Progresivitas</h3>
-                    <p className="text-sm text-muted-foreground">Mengembangkan pemikiran maju dan inovatif</p>
+                    <h3 className="font-bold">Tangguh</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Mahasiswa PSTI dilatih untuk tetap tegar dan beradaptasi dalam berbagai situasi.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -103,7 +114,7 @@ export default function Home() {
             <div className="relative h-[400px] rounded-lg overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent z-10"></div>
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi2024.jpg-sh1mEi2XIXlXfWlUYzpMgc3JS3q4Jd.jpeg"
+                src="./rotasii2024.jpg"
                 alt="Kegiatan ROTASI 2024"
                 fill
                 className="object-cover"
@@ -249,7 +260,7 @@ export default function Home() {
                 <Link href="https://www.instagram.com/rotasipsti/">Ikuti Instagram Kami</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
-                <Link href="/pendaftaran?type=panitia">Gabung Sebagai Panitia</Link>
+                <Link href="/pendaftaran?type=panitia">Gabung Sebagai Peserta</Link>
               </Button>
             </div>
           </div>

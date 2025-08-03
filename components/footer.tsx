@@ -10,7 +10,7 @@ export function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi.jpg-WzsprUfnVlIPqWrUG49J5kjH7LPv2c.jpeg"
+                src="/rotasi logo.png"
                 alt="ROTASI Logo"
                 width={50}
                 height={50}
@@ -34,7 +34,7 @@ export function Footer() {
                 <span className="sr-only">Instagram</span>
               </Link>
               <Link
-                href="https://www.youtube.com/@himapstiupi"
+                href="https://www.youtube.com/@rotasipsti"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 <Youtube className="h-5 w-5" />

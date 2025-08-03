@@ -153,32 +153,32 @@ export default function StrukturPage() {
 
             <div className="flex justify-center">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
-                {panitiaData.map((panitia, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div className="relative w-48 h-48 rounded-full overflow-hidden mb-4 border-4 border-primary">
-                      <Image src={panitia.photo || "/placeholder.svg"} alt={panitia.name} fill className="object-cover" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-1">{panitia.name}</h3>
-                    <p className="text-primary font-medium mb-2">{panitia.position}</p>
-                    <div className="flex gap-3 mb-3">
-                      <a
-                        href={`https://instagram.com/${panitia.instagram}`}
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        <Instagram className="h-5 w-5" />
-                        <span className="sr-only">Instagram</span>
-                      </a>
-                      <a
-                        href={`mailto:${panitia.email}`}
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        <Mail className="h-5 w-5" />
-                        <span className="sr-only">Email</span>
-                      </a>
-                    </div>
-                    <p className="text-sm text-muted-foreground text-center">{panitia.description}</p>
+              {panitiaData.map((panitia, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="relative w-48 h-48 rounded-full overflow-hidden mb-4 border-4 border-primary">
+                    <Image src={panitia.photo || "/placeholder.svg"} alt={panitia.name} fill className="object-cover" />
                   </div>
-                ))}
+                  <h3 className="text-xl font-bold mb-1">{panitia.name}</h3>
+                  <p className="text-primary font-medium mb-2">{panitia.position}</p>
+                  <div className="flex gap-3 mb-3">
+                    <a
+                      href={`https://instagram.com/${panitia.instagram}`}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Instagram className="h-5 w-5" />
+                      <span className="sr-only">Instagram</span>
+                    </a>
+                    <a
+                      href={`mailto:${panitia.email}`}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Mail className="h-5 w-5" />
+                      <span className="sr-only">Email</span>
+                    </a>
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center">{panitia.description}</p>
+                </div>
+              ))}
               </div>
             </div>
           </div>

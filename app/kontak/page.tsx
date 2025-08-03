@@ -116,7 +116,7 @@ export default function KontakPage() {
                       <span>@himapstiupi</span>
                     </a>
                     <a
-                      href="https://youtube.com"
+                      href="https://www.youtube.com/@rotasipsti"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
