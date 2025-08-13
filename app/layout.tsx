@@ -3,6 +3,7 @@ import type { Metadata } from "next/types"
 import { Inter, Bebas_Neue } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/contexts/AuthContext"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 
@@ -35,11 +36,13 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${bebasNeue.variable} font-sans bg-background`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
+          <AuthProvider>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

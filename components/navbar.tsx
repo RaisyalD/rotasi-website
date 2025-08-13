@@ -3,16 +3,16 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/contexts/AuthContext"
 
 const navLinks = [
   { name: "Beranda", href: "/" },
   { name: "Tentang", href: "/tentang" },
   { name: "Struktur", href: "/struktur" },
   { name: "Tahapan", href: "/tahapan" },
-  { name: "Pendaftaran", href: "/pendaftaran" },
   { name: "Tugas", href: "/tugas" },
   { name: "Galeri", href: "/galeri" },
   { name: "Kontak", href: "/kontak" },
@@ -21,6 +21,7 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,6 +30,10 @@ export function Navbar() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  const handleLogout = () => {
+    logout()
+  }
 
   return (
     <header
@@ -61,50 +66,47 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <div className="relative group">
-              <Button variant="outline" className="flex items-center gap-2">
-                Fitur
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-1">
-                  <Link href="/tentang" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Informasi Kegiatan
-                  </Link>
-                  <Link href="/tahapan" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Alur & Tahapan
-                  </Link>
-                  <Link href="/struktur" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Struktur Kepanitiaan
-                  </Link>
-                  <Link href="/galeri" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Galeri & Dokumentasi
-                  </Link>
-                  <Link href="/tentang#hima-psti" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Profil HIMA PSTI
-                  </Link>
+
+            {user ? (
+              <div className="relative group">
+                <Button variant="outline" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {user.nama_lengkap}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="py-1">
+                    <Link href="/dashboard" className="block px-4 py-2 text-sm hover:bg-accent">
+                      Dashboard
+                    </Link>
+                    <button 
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-accent text-red-600"
+                    >
+                      <LogOut className="h-4 w-4 inline mr-2" />
+                      Logout
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="relative group">
-              <Button variant="outline" className="flex items-center gap-2">
-                Daftar
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-1">
-                  <Link href="/auth/register-divisi" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Register Divisi
-                  </Link>
-                  <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Login Divisi
-                  </Link>
-                  <Link href="/auth/daftar-peserta" className="block px-4 py-2 text-sm hover:bg-accent">
-                    Daftar Peserta
-                  </Link>
+            ) : (
+              <div className="relative group">
+                <Button variant="outline" className="flex items-center gap-2">
+                  Daftar
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                  <div className="py-1">
+                    <Link href="/auth/register-divisi" className="block px-4 py-2 text-sm hover:bg-accent">
+                      Register
+                    </Link>
+                    <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-accent">
+                      Login
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -128,18 +130,33 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <div className="border-t border-border/50 pt-2 mt-2">
-              <p className="text-xs font-semibold mb-1 text-foreground/60">Daftar</p>
-              <Link href="/auth/register-divisi" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
-                Register Divisi
-              </Link>
-              <Link href="/auth/login" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
-                Login Divisi
-              </Link>
-              <Link href="/auth/daftar-peserta" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
-                Daftar Peserta
-              </Link>
-            </div>
+            {user ? (
+              <div className="border-t border-border/50 pt-2 mt-2">
+                <p className="text-xs font-semibold mb-1 text-foreground/60">User</p>
+                <Link href="/dashboard" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                  Dashboard
+                </Link>
+                <button 
+                  onClick={() => {
+                    handleLogout()
+                    setIsOpen(false)
+                  }}
+                  className="block w-full text-left py-2 text-sm hover:text-primary text-red-600"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="border-t border-border/50 pt-2 mt-2">
+                <p className="text-xs font-semibold mb-1 text-foreground/60">Daftar</p>
+                <Link href="/auth/register-divisi" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                  Register
+                </Link>
+                <Link href="/auth/login" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                  Login
+                </Link>
+              </div>
+            )}
           </div>
         </nav>
       )}

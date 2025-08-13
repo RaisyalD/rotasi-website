@@ -46,7 +46,7 @@ export default function Home() {
               style={{ animationDelay: "400ms" }}
             >
               <Button asChild size="lg" className="bg-maroon hover:bg-maroon-light">
-                <Link href="/pendaftaran">Daftar Sekarang</Link>
+                <Link href="/auth/register-divisi">Daftar Sekarang</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/tentang">Pelajari Lebih Lanjut</Link>
@@ -211,7 +211,7 @@ export default function Home() {
               {
                 icon: (
                   <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/rotasi.jpg-WzsprUfnVlIPqWrUG49J5kjH7LPv2c.jpeg"
+                    src="./rotasi logo.png"
                     alt="ROTASI Logo"
                     width={40}
                     height={40}
