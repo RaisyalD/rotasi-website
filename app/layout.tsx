@@ -34,7 +34,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
       </head>
-      <body className={`${inter.variable} ${bebasNeue.variable} font-sans bg-background`}>
+      <body className={`${inter.variable} ${bebasNeue.variable} font-sans bg-background`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
             <div className="flex min-h-screen flex-col">

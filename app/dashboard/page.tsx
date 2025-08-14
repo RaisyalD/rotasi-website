@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Users, GraduationCap, Calendar, Shield, LogOut, User, Mail, Hash } from 'lucide-react'
+import { PesertaDashboard } from '@/components/dashboard/PesertaDashboard'
+import { MentorDashboard } from '@/components/dashboard/MentorDashboard'
+import { KomdisDashboard } from '@/components/dashboard/KomdisDashboard'
+import { AcaraDashboard } from '@/components/dashboard/AcaraDashboard'
 
 export default function DashboardPage() {
   const { user, logout, isLoading } = useAuth()
@@ -138,160 +142,13 @@ export default function DashboardPage() {
         </Card>
 
         {/* Role-specific Content */}
-        {user.role === 'peserta' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Jadwal Kegiatan
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Lihat jadwal kegiatan ROTASI untuk sektor {user.sektor}
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/tahapan')}
-                >
-                  Lihat Jadwal
-                </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Tugas & Materi
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Akses materi dan tugas kaderisasi
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/tugas')}
-                >
-                  Lihat Tugas
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {user.role === 'peserta' && <PesertaDashboard user={user as any} />}
 
-        {user.role === 'mentor' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Peserta Sektor {user.sektor}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Kelola peserta di sektor {user.sektor}
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/struktur')}
-                >
-                  Lihat Peserta
-                </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Evaluasi Peserta
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Berikan evaluasi dan nilai peserta
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/tugas')}
-                >
-                  Evaluasi
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {user.role === 'mentor' && <MentorDashboard user={user as any} />}
 
-        {(user.role === 'acara' || user.role === 'komdis') && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  Semua Peserta
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Lihat data semua peserta ROTASI
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/struktur')}
-                >
-                  Lihat Peserta
-                </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5" />
-                  Semua Mentor
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Lihat data semua mentor
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/struktur')}
-                >
-                  Lihat Mentor
-                </Button>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Manajemen Kegiatan
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Kelola jadwal dan kegiatan ROTASI
-                </p>
-                <Button 
-                  className="mt-4" 
-                  variant="outline"
-                  onClick={() => router.push('/tahapan')}
-                >
-                  Kelola Kegiatan
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {user.role === 'komdis' && <KomdisDashboard />}
+
+        {user.role === 'acara' && <AcaraDashboard />}
       </div>
     </div>
   )

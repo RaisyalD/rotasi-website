@@ -23,8 +23,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [mounted, setMounted] = useState(false)
+
+  const login = (userData: User) => {
+    setUser(userData)
+    localStorage.setItem('rotasi_user', JSON.stringify(userData))
+  }
+
+  const logout = () => {
+    setUser(null)
+    localStorage.removeItem('rotasi_user')
+  }
 
   useEffect(() => {
+    setMounted(true)
     // Check for stored user data on app load
     const storedUser = localStorage.getItem('rotasi_user')
     if (storedUser) {
@@ -38,14 +50,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = (userData: User) => {
-    setUser(userData)
-    localStorage.setItem('rotasi_user', JSON.stringify(userData))
-  }
-
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem('rotasi_user')
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <AuthContext.Provider value={{ user: null, login, logout, isLoading: true }}>
+        {children}
+      </AuthContext.Provider>
+    )
   }
 
   return (

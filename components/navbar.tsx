@@ -21,12 +21,16 @@ const navLinks = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { user, logout } = useAuth()
 
   useEffect(() => {
+    setMounted(true)
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
     }
+    // Set initial scroll state
+    handleScroll()
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
@@ -35,13 +39,16 @@ export function Navbar() {
     logout()
   }
 
-  return (
-    <header
-      className={cn(
+  // Don't render scroll-dependent classes until mounted
+  const headerClasses = mounted 
+    ? cn(
         "fixed top-0 w-full z-50 transition-all duration-300",
         scrolled ? "bg-background/95 backdrop-blur-sm shadow-md" : "bg-transparent",
-      )}
-    >
+      )
+    : "fixed top-0 w-full z-50 bg-transparent"
+
+  return (
+    <header className={headerClasses}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">

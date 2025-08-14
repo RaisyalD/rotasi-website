@@ -279,5 +279,185 @@ export const authService = {
 
     if (error) throw error
     return data
+  },
+
+  // Get users by role
+  async getUsersByRole(role: string) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('role', role)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Get users by role and sector
+  async getUsersByRoleAndSector(role: string, sektor: number) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('role', role)
+      .eq('sektor', sektor)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  // Task management functions
+  async createTask(data: {
+    title: string
+    description: string
+    sector: number
+    due_date: string
+    created_by: string
+  }) {
+    const { data: task, error } = await supabase
+      .from('tasks')
+      .insert({
+        title: data.title,
+        description: data.description,
+        sector: data.sector,
+        due_date: data.due_date,
+        created_by: data.created_by
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return task
+  },
+
+  async updateTask(id: string, data: {
+    title?: string
+    description?: string
+    sector?: number
+    due_date?: string
+    status?: string
+  }) {
+    const { data: task, error } = await supabase
+      .from('tasks')
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return task
+  },
+
+  async deleteTask(id: string) {
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+    return true
+  },
+
+  async getTasks(sector?: number) {
+    let query = supabase
+      .from('tasks')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (sector) {
+      query = query.eq('sector', sector)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data
+  },
+
+  // Task submission functions
+  async createTaskSubmission(data: {
+    task_id: string
+    participant_id: string
+    submission_text?: string
+    file_url?: string
+    file_name?: string
+  }) {
+    const { data: submission, error } = await supabase
+      .from('task_submissions')
+      .insert({
+        task_id: data.task_id,
+        participant_id: data.participant_id,
+        submission_text: data.submission_text,
+        file_url: data.file_url,
+        file_name: data.file_name
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return submission
+  },
+
+  async getTaskSubmissions(taskId?: string, participantId?: string, sector?: number) {
+    let query = supabase
+      .from('task_submissions')
+      .select(`
+        *,
+        tasks (
+          id,
+          title,
+          description,
+          sector,
+          due_date
+        ),
+        participants:users!task_submissions_participant_id_fkey (
+          id,
+          nama_lengkap,
+          nim,
+          email
+        ),
+        evaluators:users!task_submissions_evaluated_by_fkey (
+          id,
+          nama_lengkap
+        )
+      `)
+      .order('submitted_at', { ascending: false })
+
+    if (taskId) {
+      query = query.eq('task_id', taskId)
+    }
+
+    if (participantId) {
+      query = query.eq('participant_id', participantId)
+    }
+
+    if (sector) {
+      query = query.eq('tasks.sector', sector)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data
+  },
+
+  async evaluateTaskSubmission(id: string, data: {
+    evaluation_score: number
+    evaluation_comment: string
+    evaluated_by: string
+  }) {
+    const { data: submission, error } = await supabase
+      .from('task_submissions')
+      .update({
+        evaluation_score: data.evaluation_score,
+        evaluation_comment: data.evaluation_comment,
+        evaluated_by: data.evaluated_by,
+        status: 'evaluated',
+        evaluated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return submission
   }
 } 
