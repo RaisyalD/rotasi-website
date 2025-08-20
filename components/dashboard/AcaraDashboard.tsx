@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, Star, AlertTriangle, FileText, Download } from 'lucide-react'
+import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -131,12 +132,14 @@ export function AcaraDashboard() {
 
   const handleCreateTask = async () => {
     if (!newTask.title || !newTask.description || !newTask.due_date) {
-      alert('Harap isi semua field')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Lengkapi data', description: 'Harap isi semua field' })
       return
     }
 
     if (!currentUser?.id) {
-      alert('User tidak ditemukan')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'User tidak ditemukan' })
       return
     }
 
@@ -164,15 +167,18 @@ export function AcaraDashboard() {
       const successCount = results.filter(result => result.success).length
       
       if (successCount > 0) {
-        alert(`Tugas berhasil dibuat untuk ${successCount} sektor!`)
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Berhasil', description: `Tugas berhasil dibuat untuk ${successCount} sektor` })
         setNewTask({ title: '', description: '', due_date: '' })
         fetchAllData()
       } else {
-        alert('Gagal membuat tugas')
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Gagal', description: 'Gagal membuat tugas' })
       }
     } catch (error) {
       console.error('Error creating task:', error)
-      alert('Gagal membuat tugas')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal membuat tugas' })
     }
   }
 
@@ -205,14 +211,16 @@ export function AcaraDashboard() {
       const data = await response.json()
 
       if (data.success) {
-        alert('Tugas berhasil diupdate!')
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Berhasil', description: 'Tugas berhasil diupdate' })
         setEditTaskDialog(false)
         setSelectedTask(null)
         fetchAllData()
       }
     } catch (error) {
       console.error('Error updating task:', error)
-      alert('Gagal mengupdate tugas')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal mengupdate tugas' })
     }
   }
 
@@ -233,25 +241,29 @@ export function AcaraDashboard() {
       const data = await response.json()
 
       if (data.success) {
-        alert('Tugas berhasil dihapus!')
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Berhasil', description: 'Tugas berhasil dihapus' })
         setDeleteConfirmDialog(false)
         setTaskToDelete(null)
         fetchAllData()
       }
     } catch (error) {
       console.error('Error deleting task:', error)
-      alert('Gagal menghapus tugas')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal menghapus tugas' })
     }
   }
 
   const handleEvaluateSubmission = async () => {
     if (!selectedSubmission || !evaluation.score || !evaluation.comment) {
-      alert('Harap isi nilai dan komentar')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Lengkapi data', description: 'Harap isi nilai dan komentar' })
       return
     }
 
     if (!currentUser?.id) {
-      alert('User tidak ditemukan')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'User tidak ditemukan' })
       return
     }
 
@@ -271,7 +283,8 @@ export function AcaraDashboard() {
       const data = await response.json()
 
       if (data.success) {
-        alert('Evaluasi berhasil disimpan!')
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Berhasil', description: 'Evaluasi berhasil disimpan' })
         setEvaluationDialog(false)
         setSelectedSubmission(null)
         setEvaluation({ score: '', comment: '' })
@@ -279,7 +292,8 @@ export function AcaraDashboard() {
       }
     } catch (error) {
       console.error('Error evaluating submission:', error)
-      alert('Gagal menyimpan evaluasi')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal menyimpan evaluasi' })
     }
   }
 
@@ -357,9 +371,8 @@ export function AcaraDashboard() {
 
       {/* Main Content */}
       <Tabs defaultValue="tasks" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="tasks">Kelola Tugas</TabsTrigger>
-          <TabsTrigger value="evaluations">Evaluasi Per Sektor</TabsTrigger>
           <TabsTrigger value="submissions">Semua Submission</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
         </TabsList>
@@ -414,161 +427,54 @@ export function AcaraDashboard() {
             </CardContent>
           </Card>
 
-          {/* Tasks List */}
+          {/* Tasks List grouped by sector */}
           <Card>
             <CardHeader>
-              <CardTitle>Daftar Tugas</CardTitle>
+              <CardTitle>Daftar Tugas per Sektor</CardTitle>
+              <CardDescription>Urut sektor 1 sampai 10</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{task.title}</h3>
-                      <p className="text-sm text-muted-foreground">{task.description}</p>
-                      <div className="flex items-center gap-4 mt-2">
-                        <Badge variant="outline">
-                          Sektor {task.sector}
-                        </Badge>
-                        <Badge variant="secondary">
-                          Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
-                        </Badge>
-                        <Badge variant={task.status === 'active' ? 'default' : 'secondary'}>
-                          {task.status === 'active' ? 'Aktif' : 'Selesai'}
-                        </Badge>
+              <div className="space-y-6">
+                {[...Array(10)].map((_, idx) => {
+                  const sectorNumber = idx + 1
+                  const sectorTasks = tasks
+                    .filter((t) => t.sector === sectorNumber)
+                    .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+                  if (sectorTasks.length === 0) return null
+                  return (
+                    <div key={sectorNumber} className="space-y-3">
+                      <h3 className="text-lg font-semibold">Sektor {sectorNumber} : {SECTOR_NAME[sectorNumber] ?? `Sektor ${sectorNumber}`}</h3>
+                      <div className="space-y-3">
+                        {sectorTasks.map((task) => (
+                          <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                            <div className="flex-1">
+                              <h3 className="font-semibold">{task.title}</h3>
+                              <p className="text-sm text-muted-foreground">{task.description}</p>
+                              <div className="flex items-center gap-4 mt-2">
+                                <Badge variant="outline">Sektor {task.sector}</Badge>
+                                <Badge variant="secondary">Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}</Badge>
+                                <Badge variant={task.status === 'active' ? 'default' : 'secondary'}>
+                                  {task.status === 'active' ? 'Aktif' : 'Selesai'}
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" variant="outline" onClick={() => handleEditTask(task)}>
+                                <Edit className="h-3 w-3 mr-1" />
+                                Edit
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleDeleteTask(task.id)}>
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                Hapus
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleEditTask(task)}
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        Edit
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="destructive"
-                        onClick={() => handleDeleteTask(task.id)}
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Hapus
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="evaluations" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5" />
-                Evaluasi Per Sektor
-              </CardTitle>
-              <CardDescription>
-                Pilih sektor untuk melihat dan mengevaluasi submission tugas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                {sectors.map((sector) => (
-                  <Button
-                    key={sector.sector_number}
-                    variant={selectedSectorForEvaluation === sector.sector_number ? "default" : "outline"}
-                    className="h-auto p-4 flex flex-col items-start"
-                    onClick={() => setSelectedSectorForEvaluation(sector.sector_number)}
-                  >
-                    <div className="font-semibold">{sector.sector_name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {getSectorSubmissions(sector.sector_number).length} submission
-                    </div>
-                  </Button>
-                ))}
-              </div>
-              
-              {selectedSectorForEvaluation && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">
-                    Submission Sektor {selectedSectorForEvaluation}
-                  </h3>
-                  <div className="space-y-4">
-                    {getSectorSubmissions(selectedSectorForEvaluation).map((submission) => (
-                      <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-                        <div className="flex items-center justify-between mb-3">
-                          <div>
-                            <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {submission.evaluation_score && (
-                              <Badge variant="default" className="bg-green-100 text-green-800">
-                                <Star className="h-3 w-3 mr-1" />
-                                {submission.evaluation_score}/100
-                              </Badge>
-                            )}
-                            <Badge variant={submission.status === 'submitted' ? 'secondary' : 'default'}>
-                              {submission.status === 'submitted' ? 'Pending' : 'Dievaluasi'}
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-3">
-                          <p className="text-sm font-medium mb-2">Deskripsi Tugas:</p>
-                          <p className="text-sm">{submission.tasks.description}</p>
-                        </div>
-                        
-                        {submission.submission_text && (
-                          <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-3">
-                            <p className="text-sm font-medium mb-2">Submission Text:</p>
-                            <p className="text-sm">{submission.submission_text}</p>
-                          </div>
-                        )}
-                        
-                        {submission.file_url && (
-                          <div className="flex items-center gap-2 mb-3">
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{submission.file_name}</span>
-                            <Button size="sm" variant="outline" asChild>
-                              <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
-                                <Download className="h-3 w-3 mr-1" />
-                                Download
-                              </a>
-                            </Button>
-                          </div>
-                        )}
-                        
-                        {submission.evaluation_comment && (
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded mb-3">
-                            <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Komentar Evaluasi:</p>
-                            <p className="text-sm text-blue-700 dark:text-blue-300">{submission.evaluation_comment}</p>
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedSubmission(submission)
-                              setEvaluationDialog(true)
-                            }}
-                          >
-                            <Eye className="h-3 w-3 mr-1" />
-                            {submission.status === 'submitted' ? 'Evaluasi' : 'Lihat Detail'}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -576,71 +482,77 @@ export function AcaraDashboard() {
         <TabsContent value="submissions" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Evaluasi Submission Tugas</CardTitle>
+              <CardTitle>Submission Tugas Terstruktur per Sektor</CardTitle>
+              <CardDescription>Urut sektor 1 sampai 10</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Sektor {submission.sector} • {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {submission.evaluation_score && (
-                          <Badge variant="default">
-                            <Star className="h-3 w-3 mr-1" />
-                            {submission.evaluation_score}/100
-                          </Badge>
-                        )}
-                        <Badge variant={submission.status === 'submitted' ? 'secondary' : 'default'}>
-                          {submission.status === 'submitted' ? 'Pending' : 'Dievaluasi'}
-                        </Badge>
-                      </div>
+              <div className="space-y-6">
+                {[...Array(10)].map((_, idx) => {
+                  const sectorNumber = idx + 1
+                  const sectorSubs = submissions
+                    .filter((s) => s.tasks.sector === sectorNumber)
+                    .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                  return (
+                    <div key={sectorNumber} className="space-y-3">
+                      <h3 className="text-lg font-semibold">Sektor {sectorNumber}</h3>
+                      {sectorSubs.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Belum ada submission</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {sectorSubs.map((submission) => (
+                            <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={submission.status === 'submitted' ? 'secondary' : submission.status === 'evaluated' ? 'default' : 'destructive'}>
+                                    {submission.status === 'submitted' ? 'Pending' : submission.status === 'evaluated' ? 'Approved' : 'Rejected'}
+                                  </Badge>
+                                </div>
+                              </div>
+                              {submission.file_url && (
+                                <div className="flex items-center gap-2 mb-3">
+                                  <FileText className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">{submission.file_name}</span>
+                                  <Button size="sm" variant="outline" asChild>
+                                    <a href={submission.file_url} target="_blank" rel="noopener noreferrer">Download</a>
+                                  </Button>
+                                  <Button size="sm" onClick={async () => {
+                                    const res = await fetch(`/api/submissions/${submission.id}/evaluate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: true, userId: currentUser?.id }) })
+                                    if (res.ok) {
+                                      // @ts-ignore
+                                      const { toast } = await import('@/hooks/use-toast')
+                                      toast({ title: 'Berhasil', description: 'Submission disetujui' })
+                                      fetchAllData()
+                                    }
+                                  }}>Approve</Button>
+                                  <Button size="sm" variant="destructive" onClick={async () => {
+                                    const res = await fetch(`/api/submissions/${submission.id}/evaluate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ approved: false, userId: currentUser?.id }) })
+                                    if (res.ok) {
+                                      // @ts-ignore
+                                      const { toast } = await import('@/hooks/use-toast')
+                                      toast({ title: 'Berhasil', description: 'Submission ditolak' })
+                                      fetchAllData()
+                                    }
+                                  }}>Reject</Button>
+                                </div>
+                              )}
+                              {submission.submission_text && (
+                                <div className="bg-gray-800 p-3 rounded mb-3">
+                                  <p className="text-sm">{submission.submission_text}</p>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    
-                    <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-3">
-                      <p className="text-sm">{submission.submission_text}</p>
-                    </div>
-                    
-                    {submission.file_url && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{submission.file_name}</span>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-3 w-3 mr-1" />
-                            Download
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {submission.evaluation_comment && (
-                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded mb-3">
-                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Komentar Evaluasi:</p>
-                        <p className="text-sm text-blue-700 dark:text-blue-300">{submission.evaluation_comment}</p>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => {
-                          setSelectedSubmission(submission)
-                          setEvaluationDialog(true)
-                        }}
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        {submission.status === 'submitted' ? 'Evaluasi' : 'Lihat Detail'}
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </CardContent>
           </Card>

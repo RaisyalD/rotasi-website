@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Users, GraduationCap, Eye, Building2, UserCheck, FileText, Download } from 'lucide-react'
+import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 
 interface SectorData {
@@ -168,10 +169,10 @@ export function KomdisDashboard() {
       </div>
 
       {/* Sectors Overview and Submissions */}
-      <Tabs defaultValue="sectors" className="w-full">
+      <Tabs defaultValue="submissions" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="sectors">Overview Sektor</TabsTrigger>
           <TabsTrigger value="submissions">Submission Tugas</TabsTrigger>
+          <TabsTrigger value="sectors">Overview Sektor</TabsTrigger>
         </TabsList>
         
         <TabsContent value="sectors" className="space-y-6">
@@ -232,29 +233,7 @@ export function KomdisDashboard() {
                     </div>
                   </div>
                   
-                  {/* Recent Submissions */}
-                  <div>
-                    <h4 className="font-medium text-sm mb-2 flex items-center gap-2">
-                      <FileText className="h-4 w-4" />
-                      Submission Terkini ({getSectorSubmissions(sector.sector_number).length})
-                    </h4>
-                    <div className="space-y-2">
-                      {getSectorSubmissions(sector.sector_number).slice(0, 3).map((submission) => (
-                        <div key={submission.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                          <div>
-                            <p className="font-medium text-sm">{submission.participants.nama_lengkap}</p>
-                            <p className="text-xs text-muted-foreground">{submission.tasks.title}</p>
-                          </div>
-                          <Badge variant="outline">
-                            {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                          </Badge>
-                        </div>
-                      ))}
-                      {getSectorSubmissions(sector.sector_number).length === 0 && (
-                        <p className="text-sm text-muted-foreground italic">Belum ada submission</p>
-                      )}
-                    </div>
-                  </div>
+                  {/* Recent submissions removed for Komdis as requested */}
                 </CardContent>
               </Card>
             ))}
@@ -266,60 +245,59 @@ export function KomdisDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Submission Tugas Semua Sektor
+                Submission Tugas Terstruktur per Sektor
               </CardTitle>
-              <CardDescription>
-                Lihat semua submission tugas dari semua sektor
-              </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {submission.tasks.title} • Sektor {submission.tasks.sector} • {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">Sektor {submission.tasks.sector}</Badge>
-                        {submission.evaluation_score && (
-                          <Badge variant="default" className="bg-green-100 text-green-800">
-                            {submission.evaluation_score}/100
-                          </Badge>
-                        )}
-                      </div>
+              <div className="space-y-6">
+                {[...Array(10)].map((_, idx) => {
+                  const sectorNumber = idx + 1
+                  const sectorSubs = submissions
+                    .filter((s) => s.tasks.sector === sectorNumber)
+                    .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                  return (
+                    <div key={sectorNumber} className="space-y-3">
+                      <h3 className="text-lg font-semibold">Sektor {sectorNumber} : {SECTOR_NAME[sectorNumber] ?? `Sektor ${sectorNumber}`}</h3>
+                      {sectorSubs.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Belum ada submission</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {sectorSubs.map((submission) => (
+                            <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                              <div className="flex items-center justify-between mb-3">
+                                <div>
+                                  <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
+                                  <p className="text-sm text-muted-foreground">
+                                    {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline">Sektor {submission.tasks.sector}</Badge>
+                                </div>
+                              </div>
+                              {submission.file_url && (
+                                <div className="flex items-center gap-2 mb-3">
+                                  <FileText className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm">{submission.file_name}</span>
+                                  <Button size="sm" variant="outline" asChild>
+                                    <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
+                                      <Download className="h-3 w-3 mr-1" /> Download
+                                    </a>
+                                  </Button>
+                                </div>
+                              )}
+                              {submission.submission_text && (
+                                <div className="bg-gray-800 p-3 rounded mb-3">
+                                  <p className="text-sm">{submission.submission_text}</p>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    
-                    {submission.submission_text && (
-                      <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-3">
-                        <p className="text-sm">{submission.submission_text}</p>
-                      </div>
-                    )}
-                    
-                    {submission.file_url && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{submission.file_name}</span>
-                        <Button size="sm" variant="outline" asChild>
-                          <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-3 w-3 mr-1" />
-                            Download
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                    
-                    {submission.evaluation_comment && (
-                      <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
-                        <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Komentar Evaluasi:</p>
-                        <p className="text-sm text-blue-700 dark:text-blue-300">{submission.evaluation_comment}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </CardContent>
           </Card>

@@ -42,7 +42,7 @@ export default function TahapanPage() {
                   title: "ROTASI Tahap I",
                   date: "September 2025",
                   location: "Kampus UPI Purwakarta",
-                  duration: "2 hari",
+                  duration: "3 hari",
                   desc: "Tahap pertama ROTASI dilaksanakan di kampus UPI Purwakarta dengan fokus pada pengenalan lingkungan kampus dan program studi.",
                   activities: [
                     "Pembukaan resmi ROTASI",

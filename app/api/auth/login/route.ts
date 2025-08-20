@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Login berhasil',
       user: {
@@ -41,6 +41,17 @@ export async function POST(request: NextRequest) {
         nim: user.nim
       }
     })
+
+    // Set app session cookie for middleware-based protection
+    response.cookies.set('rotasi_session', String(user.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    })
+
+    return response
 
   } catch (error: any) {
     console.error('Login error:', error)

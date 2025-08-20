@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Calendar, GraduationCap, Upload, FileText, Eye, Download, CheckCircle, Clock, AlertTriangle } from 'lucide-react'
+import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -102,6 +103,7 @@ export function PesertaDashboard({ user }: { user: User }) {
         const formData = new FormData()
         formData.append('file', uploadForm.file)
         formData.append('folder', 'task-submissions')
+        formData.append('task_id', selectedTask.id)
 
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
@@ -134,7 +136,8 @@ export function PesertaDashboard({ user }: { user: User }) {
       const submissionData = await submissionResponse.json()
 
       if (submissionData.success) {
-        alert('Tugas berhasil diupload!')
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Berhasil', description: 'Tugas berhasil diupload' })
         setUploadDialog(false)
         setUploadForm({ submission_text: '', file: null })
         setSelectedTask(null)
@@ -142,7 +145,8 @@ export function PesertaDashboard({ user }: { user: User }) {
       }
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Gagal mengupload tugas')
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal mengupload tugas' })
     } finally {
       setIsUploading(false)
     }
@@ -249,7 +253,7 @@ export function PesertaDashboard({ user }: { user: User }) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Tugas Sektor {user.sektor}
+                Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}
               </CardTitle>
               <CardDescription>
                 Daftar tugas yang harus dikumpulkan
@@ -262,7 +266,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                   const submission = submissions.find(sub => sub.task_id === task.id)
                   
                   return (
-                    <div key={task.id} className="border rounded-lg p-4 bg-white">
+                    <div key={task.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           {getTaskStatusIcon(taskStatus)}
@@ -283,11 +287,6 @@ export function PesertaDashboard({ user }: { user: User }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}</span>
-                          {submission?.evaluation_score && (
-                            <span className="text-green-600 font-medium">
-                              Nilai: {submission.evaluation_score}/100
-                            </span>
-                          )}
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -339,7 +338,7 @@ export function PesertaDashboard({ user }: { user: User }) {
             <CardContent>
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-white">
+                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{submission.tasks.title}</h3>
@@ -349,16 +348,11 @@ export function PesertaDashboard({ user }: { user: User }) {
                       </div>
                       <div className="flex items-center gap-2">
                         {getStatusBadge(submission.status)}
-                        {submission.evaluation_score && (
-                          <Badge variant="default" className="bg-green-100 text-green-800">
-                            {submission.evaluation_score}/100
-                          </Badge>
-                        )}
                       </div>
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-gray-50 p-3 rounded mb-3">
+                      <div className="bg-gray-800 p-3 rounded mb-3">
                         <p className="text-sm">{submission.submission_text}</p>
                       </div>
                     )}
@@ -376,12 +370,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                       </div>
                     )}
                     
-                    {submission.evaluation_comment && (
-                      <div className="bg-blue-50 p-3 rounded">
-                        <p className="text-sm font-medium text-blue-800">Komentar Evaluasi:</p>
-                        <p className="text-sm text-blue-700">{submission.evaluation_comment}</p>
-                      </div>
-                    )}
+                    {/* nilai dan komentar disembunyikan untuk peserta */}
                   </div>
                 ))}
               </div>

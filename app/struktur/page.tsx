@@ -8,7 +8,7 @@ export default function StrukturPage() {
     {
       position: "Penanggung Jawab",
       name: "Rheindy Ari Laksono",
-      photo: "/placeholder.svg?height=300&width=300",
+      photo: "/reironaldo.jpg?height=300&width=300",
       instagram: "rotasipsti",
       email: "rotasi@psti.upi.edu",
       description: "Bertanggung jawab atas keseluruhan kegiatan ROTASI 2025.",
@@ -24,7 +24,7 @@ export default function StrukturPage() {
     {
       position: "Ketua Pelaksana",
       name: "Fahri Bintang",
-      photo: "/placeholder.svg?height=300&width=300",
+      photo: "/yosmar.jpg?height=300&width=300",
       instagram: "rotasipsti",
       email: "rotasi@psti.upi.edu",
       description: "Bertanggung jawab atas keseluruhan pelaksanaan ROTASI 2025.",
@@ -35,96 +35,96 @@ export default function StrukturPage() {
     {
       name: "Divisi Sekretaris",
       members: [
-        { position: "Koordinator", name: "Naufal" },
+        { position: "Koordinator", name: "Sayyidah Muthiara Kamilah" },
+        { position: "Wakil Koordinator", name: "Septiana Putri" },
       ],
       description: "Mengelola administrasi dan dokumentasi kegiatan ROTASI.",
     },
     {
       name: "Divisi Bendahara",
       members: [
-        { position: "Koordinator", name: "Budi Santoso" },
-        { position: "Anggota", name: "Rina Marlina" },
+        { position: "Koordinator", name: "Niha Karina Azzahra" },
+        { position: "Wakil Koordinator", name: "Indri Rahmawati" },
       ],
       description: "Bertanggung jawab atas pengelolaan keuangan dan anggaran kegiatan ROTASI.",
     },
     {
       name: "Divisi Acara",
       members: [
-        { position: "Koordinator", name: "Indra Bekti" },
-        { position: "Anggota", name: "Putri Marino" },
-        { position: "Anggota", name: "Rizky Febian" },
+        { position: "Koordinator", name: "Octavian Purwa Ramadhani Hidayat" },
+        { position: "Wakil Koordinator", name: "Amara Seviany" },
       ],
       description: "Bertanggung jawab atas perencanaan dan pelaksanaan seluruh rangkaian acara ROTASI.",
     },
     {
       name: "Divisi Relasi",
       members: [
-        { position: "Koordinator", name: "Raisa Andriana" },
-        { position: "Anggota", name: "Isyana Sarasvati" },
+        { position: "Koordinator", name: "Muhammad Raffi Akhdan" },
+        { position: "Wakil Koordinator", name: "Nabila Ramadhani" },
       ],
       description: "Bertanggung jawab atas hubungan dengan pihak eksternal dan sponsorship.",
     },
     {
       name: "Divisi Mentor",
       members: [
-        { position: "Koordinator", name: "Farah Diba" },
-        { position: "Anggota", name: "Dimas Anggara" },
+        { position: "Koordinator", name: "Alica Azwa Nayla" },
+        { position: "Wakil Koordinator", name: "Ilham Agung Pambudi" },
       ],
       description: "Bertanggung jawab atas pembimbingan peserta selama kegiatan ROTASI.",
     },
     {
       name: "Divisi Keamanan",
       members: [
-        { position: "Koordinator", name: "Iko Uwais" },
-        { position: "Anggota", name: "Joe Taslim" },
+        { position: "Koordinator", name: "Rifat Ali Nurjaman" },
+        { position: "Wakil Koordinator", name: "Aryo Bayu Fauzan Ramadhan" },
       ],
       description: "Bertanggung jawab atas keamanan dan ketertiban selama kegiatan ROTASI.",
     },
     {
       name: "Divisi Kreatif",
       members: [
-        { position: "Koordinator", name: "Arief Muhammad" },
-        { position: "Anggota", name: "Baim Wong" },
+        { position: "Koordinator", name: "Dara Puspita" },
+        { position: "Wakil Koordinator", name: "Agizka Rizqta" },
       ],
       description: "Bertanggung jawab atas desain dan konten kreatif untuk kegiatan ROTASI.",
     },
     {
       name: "Divisi Pendanaan",
       members: [
-        { position: "Koordinator", name: "Maudy Ayunda" },
-        { position: "Anggota", name: "Afgansyah Reza" },
+        { position: "Koordinator", name: "Siti Shofa" },
+        { position: "Wakil Koordinator", name: "Ismawatus Nurul Fadhilah" },
       ],
       description: "Bertanggung jawab atas pencarian dana dan sponsorship untuk kegiatan ROTASI.",
     },
     {
       name: "Divisi Inventaris",
       members: [
-        { position: "Koordinator", name: "Reza Rahadian" },
-        { position: "Anggota", name: "Lia Amalia" },
+        { position: "Koordinator", name: "Amirul Muhammad Rabbani" },
+        { position: "Wakil Koordinator", name: "Fikriansyah Haikal Ramadhan" },
       ],
       description: "Bertanggung jawab atas penyediaan dan pengelolaan perlengkapan kegiatan.",
     },
     {
       name: "Divisi Konsumsi",
       members: [
-        { position: "Koordinator", name: "Dedi Supriadi" },
-        { position: "Anggota", name: "Putri Marino" },
+        { position: "Koordinator", name: "Hanifah Nurul Aini" },
+        { position: "Wakil Koordinator", name: "Naufal Hazazi Dzil Ikram" },
       ],
       description: "Bertanggung jawab atas penyediaan konsumsi selama kegiatan ROTASI.",
     },
     {
       name: "Divisi Medis",
       members: [
-        { position: "Koordinator", name: "Iqbaal Ramadhan" },
-        { position: "Anggota", name: "Yayan Ruhian" },
+        { position: "Koordinator", name: "Salsabila Bunga Azzahra" },
+        { position: "Wakil Koordinator", name: "Ibnaty Alilatulbariza" },
       ],
       description: "Bertanggung jawab atas kesehatan dan pertolongan pertama selama kegiatan ROTASI.",
     },
     {
       name: "Divisi Komdis",
       members: [
-        { position: "Koordinator", name: "Iko Uwais" },
-        { position: "Anggota", name: "Joe Taslim" },
+        { position: "Koordinator", name: "Anggita Fitri Permatasari" },
+        { position: "Wakil Koordinator", name: "Salwa Aulia" },
       ],
       description: "Bertanggung jawab atas kedisiplinan dan ketertiban peserta selama kegiatan ROTASI.",
     },
@@ -223,7 +223,7 @@ export default function StrukturPage() {
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="md:w-1/3 flex justify-center">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/himapsti.jpg-FYGOXP6T1ihGQJxEaE8UOE6mfGJvVT.jpeg"
+                  src="HIMA-PSTI.svg"
                   alt="HIMA PSTI Logo"
                   width={200}
                   height={200}

@@ -139,10 +139,10 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="timeline-container">
               {[
-                { title: "Pra-ROTASI", date: "Juli 2025", desc: "Persiapan dan pengenalan awal" },
+                { title: "Pra-ROTASI", date: "Agustus 2025", desc: "Persiapan dan pengenalan awal" },
                 {
                   title: "ROTASI Tahap I",
-                  date: "Agustus 2025",
+                  date: "September 2025",
                   desc: "Pengenalan lingkungan kampus dan program studi",
                 },
                 {
@@ -224,7 +224,7 @@ export default function Home() {
               {
                 icon: (
                   <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/himapsti.jpg-FYGOXP6T1ihGQJxEaE8UOE6mfGJvVT.jpeg"
+                    src="HIMA-PSTI.svg"
                     alt="HIMA PSTI Logo"
                     width={40}
                     height={40}
@@ -260,7 +260,7 @@ export default function Home() {
                 <Link href="https://www.instagram.com/rotasipsti/">Ikuti Instagram Kami</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
-                <Link href="/pendaftaran?type=panitia">Gabung Sebagai Peserta</Link>
+                <Link href="/auth/register-divisi">Gabung Sebagai Peserta</Link>
               </Button>
             </div>
           </div>

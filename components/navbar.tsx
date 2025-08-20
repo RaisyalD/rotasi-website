@@ -7,13 +7,13 @@ import { Menu, X, ChevronDown, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/AuthContext"
+import { useRouter } from "next/navigation"
 
 const navLinks = [
   { name: "Beranda", href: "/" },
   { name: "Tentang", href: "/tentang" },
   { name: "Struktur", href: "/struktur" },
   { name: "Tahapan", href: "/tahapan" },
-  { name: "Tugas", href: "/tugas" },
   { name: "Galeri", href: "/galeri" },
   { name: "Kontak", href: "/kontak" },
 ]
@@ -23,6 +23,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { user, logout } = useAuth()
+  const router = useRouter()
 
   useEffect(() => {
     setMounted(true)
@@ -35,8 +36,13 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch {}
     logout()
+    setIsOpen(false)
+    router.push('/')
   }
 
   // Don't render scroll-dependent classes until mounted
@@ -104,10 +110,10 @@ export function Navbar() {
                 </Button>
                 <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                   <div className="py-1">
-                    <Link href="/auth/register-divisi" className="block px-4 py-2 text-sm hover:bg-accent">
+                    <Link href="/auth/register-divisi?allow=1" className="block px-4 py-2 text-sm hover:bg-accent">
                       Register
                     </Link>
-                    <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-accent">
+                    <Link href="/auth/login?allow=1" className="block px-4 py-2 text-sm hover:bg-accent">
                       Login
                     </Link>
                   </div>
@@ -156,10 +162,10 @@ export function Navbar() {
             ) : (
               <div className="border-t border-border/50 pt-2 mt-2">
                 <p className="text-xs font-semibold mb-1 text-foreground/60">Daftar</p>
-                <Link href="/auth/register-divisi" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                <Link href="/auth/register-divisi?allow=1" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
                   Register
                 </Link>
-                <Link href="/auth/login" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
+                <Link href="/auth/login?allow=1" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>
                   Login
                 </Link>
               </div>

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Users, GraduationCap, Eye, FileText, CheckCircle, Clock, Download, AlertTriangle } from 'lucide-react'
+import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 
 interface Mentee extends User {
@@ -180,7 +181,7 @@ export function MentorDashboard({ user }: { user: User }) {
                   const menteeSubmissions = getMenteeSubmissions(mentee.id)
                   
                   return (
-                    <div key={mentee.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                    <div key={mentee.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <h3 className="font-semibold">{mentee.nama_lengkap}</h3>
@@ -196,13 +197,13 @@ export function MentorDashboard({ user }: { user: User }) {
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm">Tugas Terkini:</h4>
                         {menteeSubmissions.slice(0, 3).map((submission) => (
-                          <div key={submission.id} className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                          <div key={submission.id} className="flex items-center justify-between p-2 bg-gray-800 rounded">
                             <div className="flex items-center gap-2">
                               {getStatusIcon(submission.status)}
                               <div>
-                                <p className="font-medium text-sm">{submission.tasks.title}</p>
+                                <p className="font-medium text-sm">{submission.tasks?.title ?? 'Tugas'}</p>
                                 <p className="text-xs text-muted-foreground">
-                                  {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
+                                  {new Date(submission.submitted_at).toLocaleString('id-ID')}
                                 </p>
                               </div>
                             </div>
@@ -239,7 +240,7 @@ export function MentorDashboard({ user }: { user: User }) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5" />
-                Submission Tugas Sektor {user.sektor}
+                Submission Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}
               </CardTitle>
               <CardDescription>
                 Lihat semua submission tugas dari mentee
@@ -248,26 +249,21 @@ export function MentorDashboard({ user }: { user: User }) {
             <CardContent>
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
+                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
+                          {(submission.tasks?.title ?? 'Tugas')} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
-                        {submission.evaluation_score && (
-                          <Badge variant="default" className="bg-green-100 text-green-800">
-                            {submission.evaluation_score}/100
-                          </Badge>
-                        )}
                         {getStatusBadge(submission.status)}
                       </div>
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mb-3">
+                      <div className="bg-gray-800 p-3 rounded mb-3">
                         <p className="text-sm">{submission.submission_text}</p>
                       </div>
                     )}
@@ -336,11 +332,7 @@ export function MentorDashboard({ user }: { user: User }) {
                     {getStatusIcon(selectedSubmission.status)}
                     {getStatusBadge(selectedSubmission.status)}
                   </div>
-                  {selectedSubmission.evaluation_score && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Nilai: {selectedSubmission.evaluation_score}/100
-                    </p>
-                  )}
+                  {/* nilai mentee disembunyikan */}
                 </div>
               </div>
               

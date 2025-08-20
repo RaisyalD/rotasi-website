@@ -241,7 +241,7 @@ export default function TentangPage() {
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="md:w-1/3 flex justify-center">
                 <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/himapsti.jpg-FYGOXP6T1ihGQJxEaE8UOE6mfGJvVT.jpeg"
+                  src="HIMA-PSTI.svg"
                   alt="HIMA PSTI Logo"
                   width={200}
                   height={200}

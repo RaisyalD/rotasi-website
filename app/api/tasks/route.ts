@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authService } from '@/lib/supabase'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,8 +35,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate caller identity via cookie to avoid spoofed userId
+    const cookieUserId = request.cookies.get('rotasi_session')?.value
+    if (!cookieUserId || cookieUserId !== userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      return NextResponse.json(
+        { error: 'Server storage not configured. Missing SUPABASE_SERVICE_ROLE_KEY or URL.' },
+        { status: 500 }
+      )
+    }
+
+    // Use service role client to comply with RLS while enforcing our own checks
+    const admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+
     // Check if user has acara role
-    const { data: userData, error: userError } = await supabase
+    const { data: userData, error: userError } = await admin
       .from('users')
       .select('role')
       .eq('id', userId)
@@ -49,13 +72,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const task = await authService.createTask({
-      title,
-      description,
-      sector: parseInt(sector),
-      due_date,
-      created_by: userId
-    })
+    const { data: task, error: insertError } = await admin
+      .from('tasks')
+      .insert({
+        title,
+        description,
+        sector: parseInt(sector),
+        due_date,
+        created_by: userId
+      })
+      .select()
+      .single()
+
+    if (insertError) {
+      throw insertError
+    }
     
     return NextResponse.json({
       success: true,

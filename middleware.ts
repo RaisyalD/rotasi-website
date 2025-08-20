@@ -37,13 +37,19 @@ export async function middleware(request: NextRequest) {
 
   // If there's no user and the user is trying to access a protected route,
   // redirect them to the login page
-  if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
+  const hasAppSession = Boolean(request.cookies.get('rotasi_session')?.value)
+
+  if (!user && !hasAppSession && request.nextUrl.pathname.startsWith('/dashboard')) {
     const redirectUrl = new URL('/auth/login', request.url)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // If there's a user and they're trying to access auth pages, redirect them to dashboard
-  if (user && (request.nextUrl.pathname.startsWith('/auth/login') || request.nextUrl.pathname.startsWith('/auth/register'))) {
+  // If there's a user and they're trying to access any auth pages, redirect them to dashboard
+  // Allow bypass with ?allow=1 so user can switch accounts
+  const allowAuthPage = request.nextUrl.searchParams.get('allow') === '1'
+  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+  const isRegisterDivisi = request.nextUrl.pathname.startsWith('/auth/register-divisi')
+  if (!isRegisterDivisi && !allowAuthPage && (user || hasAppSession) && isAuthPage) {
     const redirectUrl = new URL('/dashboard', request.url)
     return NextResponse.redirect(redirectUrl)
   }

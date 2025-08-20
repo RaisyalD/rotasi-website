@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authService } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,18 +7,52 @@ export async function GET(request: NextRequest) {
     const role = searchParams.get('role')
     const sektor = searchParams.get('sektor')
 
-    let users
-
-    if (role && sektor) {
-      // Get users by role and sector
-      users = await authService.getUsersByRoleAndSector(role, parseInt(sektor))
-    } else if (role) {
-      // Get users by role only
-      users = await authService.getUsersByRole(role)
-    } else {
-      // Get all users
-      users = await authService.getAllUsers()
+    const cookieUserId = request.cookies.get('rotasi_session')?.value
+    if (!cookieUserId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+
+    const { data: me, error: meErr } = await admin
+      .from('users')
+      .select('id, role, sektor')
+      .eq('id', cookieUserId)
+      .single()
+    if (meErr || !me) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    let query = admin.from('users').select('*')
+
+    if (me.role === 'peserta') {
+      // Peserta hanya boleh melihat dirinya sendiri
+      query = admin.from('users').select('*').eq('id', me.id)
+    } else if (me.role === 'mentor') {
+      // Mentor dibatasi pada sektornya.
+      // Jika klien meminta role tertentu, hormati; default ke 'peserta'.
+      query = admin.from('users').select('*').eq('sektor', me.sektor)
+      if (role) {
+        query = query.eq('role', role)
+      } else {
+        query = query.eq('role', 'peserta')
+      }
+    } else {
+      // acara dan komdis: izinkan filter apa adanya
+      if (role) {
+        query = query.eq('role', role)
+      }
+      if (sektor) {
+        query = query.eq('sektor', parseInt(sektor))
+      }
+    }
+
+    const { data: users, error } = await query
+    if (error) throw error
     
     return NextResponse.json({
       success: true,

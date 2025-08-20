@@ -34,7 +34,12 @@ export default function DashboardPage() {
     return null
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+    } catch (e) {
+      // ignore
+    }
     logout()
     router.push('/')
   }

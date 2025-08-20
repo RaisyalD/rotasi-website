@@ -7,40 +7,40 @@ export default function GaleriPage() {
   const galleryData = {
     "2024": [
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/pembukaan.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Pembukaan",
         caption: "Pembukaan ROTASI 2024",
       },
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/kelompok.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Diskusi Kelompok",
         caption: "Diskusi Kelompok",
       },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2024 - Outbound", caption: "Kegiatan Outbound" },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2024 - Presentasi", caption: "Sesi Presentasi" },
+      { src: "/otbond.jpg?height=400&width=600", alt: "ROTASI 2024 - Outbound", caption: "Kegiatan Outbound" },
+      { src: "/present.jpg?height=400&width=600", alt: "ROTASI 2024 - Presentasi", caption: "Sesi Presentasi" },
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/malamakrab.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Malam Keakraban",
         caption: "Malam Keakraban",
       },
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/penutupan.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Penutupan",
         caption: "Penutupan ROTASI 2024",
       },
     ],
     "2023": [
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/opening_rotasi23.jpg?height=400&width=600",
         alt: "ROTASI 2023 - Pembukaan",
         caption: "Pembukaan ROTASI 2023",
       },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2023 - Workshop", caption: "Workshop Teknologi" },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2023 - Team Building", caption: "Team Building" },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2023 - Diskusi Panel", caption: "Diskusi Panel" },
-      { src: "/placeholder.svg?height=400&width=600", alt: "ROTASI 2023 - Pentas Seni", caption: "Pentas Seni" },
+      { src: "/workshop_teknologi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Workshop", caption: "Workshop Teknologi" },
+      { src: "/team_building23.jpg?height=400&width=600", alt: "ROTASI 2023 - Team Building", caption: "Team Building" },
+      { src: "/diskusi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Diskusi Panel", caption: "Diskusi Panel" },
+      { src: "/pensi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Pentas Seni", caption: "Pentas Seni" },
       {
-        src: "/placeholder.svg?height=400&width=600",
+        src: "/penutupan23.jpg?height=400&width=600",
         alt: "ROTASI 2023 - Penutupan",
         caption: "Penutupan ROTASI 2023",
       },
@@ -83,7 +83,7 @@ export default function GaleriPage() {
             <Separator className="w-24 h-1 bg-primary mx-auto mb-8" />
 
             <p className="text-lg text-center mb-8">
-              Lihat dokumentasi kegiatan ROTASI dari tahun ke tahun dan testimoni dari para Savior.
+            Yuk intip keseruan ROTASI dari tahun ke tahun, plus baca langsung cerita seru dari para Savior yang udah ngerasain sendiri pengalaman ini!
             </p>
           </div>
         </div>

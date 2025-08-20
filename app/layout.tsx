@@ -3,6 +3,7 @@ import type { Metadata } from "next/types"
 import { Inter, Bebas_Neue } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
@@ -41,6 +42,7 @@ export default function RootLayout({
               <Navbar />
               <main className="flex-1">{children}</main>
               <Footer />
+              <Toaster />
             </div>
           </AuthProvider>
         </ThemeProvider>
