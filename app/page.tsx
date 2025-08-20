@@ -18,7 +18,7 @@ export default function Home() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover z-0 brightness-50"
         >
-          <source src="/logo.mp4" type="video/mp4" />
+          <source src="https://content.rotasipsti.id/videos/logo.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 hero-gradient"></div>
         <div className="container mx-auto px-4 py-12 relative z-10">

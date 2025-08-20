@@ -7,40 +7,40 @@ export default function GaleriPage() {
   const galleryData = {
     "2024": [
       {
-        src: "/pembukaan.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2024/IMG_0374.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Pembukaan",
         caption: "Pembukaan ROTASI 2024",
       },
       {
-        src: "/kelompok.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2024/IMG_0469.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Diskusi Kelompok",
         caption: "Diskusi Kelompok",
       },
-      { src: "/otbond.jpg?height=400&width=600", alt: "ROTASI 2024 - Outbound", caption: "Kegiatan Outbound" },
-      { src: "/present.jpg?height=400&width=600", alt: "ROTASI 2024 - Presentasi", caption: "Sesi Presentasi" },
+      { src: "https://content.rotasipsti.id/images/rotasi2024/DSC_1413.jpg?height=400&width=600", alt: "ROTASI 2024 - Outbound", caption: "Kegiatan Outbound" },
+      { src: "https://content.rotasipsti.id/images/rotasi2024/DSC02455.jpg?height=400&width=600", alt: "ROTASI 2024 - Presentasi", caption: "Sesi Presentasi" },
       {
-        src: "/malamakrab.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2024/DSC02206.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Malam Keakraban",
         caption: "Malam Keakraban",
       },
       {
-        src: "/penutupan.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2024/PIF_3119.jpg?height=400&width=600",
         alt: "ROTASI 2024 - Penutupan",
         caption: "Penutupan ROTASI 2024",
       },
     ],
     "2023": [
       {
-        src: "/opening_rotasi23.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2023/opening_rotasi23.jpg?height=400&width=600",
         alt: "ROTASI 2023 - Pembukaan",
         caption: "Pembukaan ROTASI 2023",
       },
-      { src: "/workshop_teknologi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Workshop", caption: "Workshop Teknologi" },
-      { src: "/team_building23.jpg?height=400&width=600", alt: "ROTASI 2023 - Team Building", caption: "Team Building" },
-      { src: "/diskusi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Diskusi Panel", caption: "Diskusi Panel" },
-      { src: "/pensi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Pentas Seni", caption: "Pentas Seni" },
+      { src: "https://content.rotasipsti.id/images/rotasi2023/workshop_teknologi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Workshop", caption: "Workshop Teknologi" },
+      { src: "https://content.rotasipsti.id/images/rotasi2023/team_building23.jpg?height=400&width=600", alt: "ROTASI 2023 - Team Building", caption: "Team Building" },
+      { src: "https://content.rotasipsti.id/images/rotasi2023/diskusi23.png?height=400&width=600", alt: "ROTASI 2023 - Diskusi Panel", caption: "Diskusi Panel" },
+      { src: "https://content.rotasipsti.id/images/rotasi2023/pensi23.jpg?height=400&width=600", alt: "ROTASI 2023 - Pentas Seni", caption: "Pentas Seni" },
       {
-        src: "/penutupan23.jpg?height=400&width=600",
+        src: "https://content.rotasipsti.id/images/rotasi2023/penutupan23.jpg?height=400&width=600",
         alt: "ROTASI 2023 - Penutupan",
         caption: "Penutupan ROTASI 2023",
       },

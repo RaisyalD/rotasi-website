@@ -16,7 +16,7 @@ export default function StrukturPage() {
     {
       position: "Steering Committee",
       name: "Rhezwan & Ariestama",
-      photo: "/placeholder.svg?height=300&width=300",
+      photo: "https://content.rotasipsti.id/images/stakeholder/IMG_7529.jpg?height=300&width=300",
       instagram: "himapstiupi",
       email: "himapsti@upi.edu",
       description: "Memberikan arahan dan pengawasan terhadap pelaksanaan ROTASI 2025.",
@@ -24,7 +24,7 @@ export default function StrukturPage() {
     {
       position: "Ketua Pelaksana",
       name: "Fahri Bintang",
-      photo: "/yosmar.jpg?height=300&width=300",
+      photo: "https://content.rotasipsti.id/images/stakeholder/yosmar.jpg?height=300&width=300",
       instagram: "rotasipsti",
       email: "rotasi@psti.upi.edu",
       description: "Bertanggung jawab atas keseluruhan pelaksanaan ROTASI 2025.",
