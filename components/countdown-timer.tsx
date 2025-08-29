@@ -10,7 +10,7 @@ type TimeLeft = {
   seconds: number
 }
 
-export default function CountdownTimer({ targetDate = "2025-09-01T00:00:00" }: { targetDate?: string }) {
+export default function CountdownTimer({ targetDate = "2025-10-01T00:00:00" }: { targetDate?: string }) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({
     days: 0,
     hours: 0,
