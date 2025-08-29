@@ -49,7 +49,9 @@ export async function middleware(request: NextRequest) {
   const allowAuthPage = request.nextUrl.searchParams.get('allow') === '1'
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
   const isRegisterDivisi = request.nextUrl.pathname.startsWith('/auth/register-divisi')
-  if (!isRegisterDivisi && !allowAuthPage && (user || hasAppSession) && isAuthPage) {
+  // Only redirect away from auth pages if Supabase auth user exists.
+  // Do NOT rely on custom app cookie here to avoid redirect loops when localStorage user is absent.
+  if (!isRegisterDivisi && !allowAuthPage && user && isAuthPage) {
     const redirectUrl = new URL('/dashboard', request.url)
     return NextResponse.redirect(redirectUrl)
   }

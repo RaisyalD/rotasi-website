@@ -9,7 +9,6 @@ import { Badge } from '@/components/ui/badge'
 import { Users, GraduationCap, Calendar, Shield, LogOut, User, Mail, Hash } from 'lucide-react'
 import { PesertaDashboard } from '@/components/dashboard/PesertaDashboard'
 import { MentorDashboard } from '@/components/dashboard/MentorDashboard'
-import { KomdisDashboard } from '@/components/dashboard/KomdisDashboard'
 import { AcaraDashboard } from '@/components/dashboard/AcaraDashboard'
 
 export default function DashboardPage() {
@@ -53,7 +52,7 @@ export default function DashboardPage() {
       case 'acara':
         return <Calendar className="h-6 w-6" />
       case 'komdis':
-        return <Shield className="h-6 w-6" />
+        return <User className="h-6 w-6" />
       default:
         return <User className="h-6 w-6" />
     }
@@ -68,7 +67,7 @@ export default function DashboardPage() {
       case 'acara':
         return 'bg-orange-100 text-orange-800'
       case 'komdis':
-        return 'bg-red-100 text-red-800'
+        return 'bg-gray-100 text-gray-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -83,7 +82,7 @@ export default function DashboardPage() {
       case 'acara':
         return 'Divisi Acara'
       case 'komdis':
-        return 'Komdis'
+        return 'User'
       default:
         return role
     }
@@ -151,7 +150,7 @@ export default function DashboardPage() {
 
         {user.role === 'mentor' && <MentorDashboard user={user as any} />}
 
-        {user.role === 'komdis' && <KomdisDashboard />}
+        {/* Komdis dashboard removed */}
 
         {user.role === 'acara' && <AcaraDashboard />}
       </div>

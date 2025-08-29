@@ -184,6 +184,18 @@ export function PesertaDashboard({ user }: { user: User }) {
     }
   }
 
+  const isSubmissionLate = (task: Task, submittedAt: string) => {
+    try {
+      const submitted = new Date(submittedAt)
+      const deadline = new Date(task.due_date)
+      // treat deadline as end of day local time
+      deadline.setHours(23, 59, 59, 999)
+      return submitted.getTime() > deadline.getTime()
+    } catch {
+      return false
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -287,6 +299,17 @@ export function PesertaDashboard({ user }: { user: User }) {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}</span>
+                          {(() => {
+                            const now = new Date()
+                            const deadline = new Date(task.due_date)
+                            deadline.setHours(23, 59, 59, 999)
+                            if (now.getTime() > deadline.getTime()) {
+                              return (
+                                <Badge variant="destructive">Melewati deadline</Badge>
+                              )
+                            }
+                            return null
+                          })()}
                         </div>
                         
                         <div className="flex items-center gap-2">
@@ -347,6 +370,9 @@ export function PesertaDashboard({ user }: { user: User }) {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
+                        {isSubmissionLate(submission.tasks, submission.submitted_at) && (
+                          <Badge variant="destructive">Terlambat</Badge>
+                        )}
                         {getStatusBadge(submission.status)}
                       </div>
                     </div>

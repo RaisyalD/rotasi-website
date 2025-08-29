@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/contexts/AuthContext'
-import { Users, GraduationCap, Calendar, Shield } from 'lucide-react'
+import { Users, GraduationCap, Calendar } from 'lucide-react'
 
 interface Sector {
   sector_number: number
@@ -20,7 +20,7 @@ interface Sector {
 export function RegisterForm() {
   const router = useRouter()
   const { login } = useAuth()
-  const [userType, setUserType] = useState<'peserta' | 'mentor' | 'acara' | 'komdis'>('peserta')
+  const [userType, setUserType] = useState<'peserta' | 'mentor' | 'acara'>('peserta')
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -93,7 +93,7 @@ export function RegisterForm() {
           sektor: parseInt(formData.sektor),
           sectorPassword: formData.sectorPassword
         }),
-        ...((userType === 'acara' || userType === 'komdis') && {
+        ...(userType === 'acara' && {
           email: formData.email,
           loginPassword: formData.loginPassword,
           divisionPassword: formData.divisionPassword
@@ -286,13 +286,13 @@ export function RegisterForm() {
         />
       </div>
       <div>
-        <Label htmlFor="divisionPassword">Password {userType === 'acara' ? 'Divisi Acara' : 'Komdis'}</Label>
+        <Label htmlFor="divisionPassword">Password Divisi Acara</Label>
         <Input
           id="divisionPassword"
           type="password"
           value={formData.divisionPassword}
           onChange={(e) => handleInputChange('divisionPassword', e.target.value)}
-          placeholder={`Masukkan password ${userType === 'acara' ? 'divisi acara' : 'komdis'}`}
+          placeholder={`Masukkan password divisi acara`}
           required
         />
       </div>
@@ -311,7 +311,7 @@ export function RegisterForm() {
           </CardHeader>
           <CardContent>
             <Tabs value={userType} onValueChange={(value) => setUserType(value as any)}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="peserta" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   Peserta
@@ -324,10 +324,6 @@ export function RegisterForm() {
                   <Calendar className="h-4 w-4" />
                   Acara
                 </TabsTrigger>
-                <TabsTrigger value="komdis" className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  Komdis
-                </TabsTrigger>
               </TabsList>
 
               <form onSubmit={handleSubmit} className="mt-6">
@@ -338,9 +334,6 @@ export function RegisterForm() {
                   {renderMentorForm()}
                 </TabsContent>
                 <TabsContent value="acara">
-                  {renderDivisiForm()}
-                </TabsContent>
-                <TabsContent value="komdis">
                   {renderDivisiForm()}
                 </TabsContent>
 

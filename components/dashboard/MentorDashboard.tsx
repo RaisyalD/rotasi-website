@@ -96,6 +96,17 @@ export function MentorDashboard({ user }: { user: User }) {
     }
   }
 
+  const isSubmissionLate = (task: Task, submittedAt: string) => {
+    try {
+      const submitted = new Date(submittedAt)
+      const deadline = new Date(task.due_date)
+      deadline.setHours(23, 59, 59, 999)
+      return submitted.getTime() > deadline.getTime()
+    } catch {
+      return false
+    }
+  }
+
   const getMenteeSubmissions = (menteeId: string) => {
     return submissions.filter(sub => sub.participant_id === menteeId)
   }
@@ -258,6 +269,9 @@ export function MentorDashboard({ user }: { user: User }) {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
+                        {isSubmissionLate(submission.tasks, submission.submitted_at) && (
+                          <Badge variant="destructive">Terlambat</Badge>
+                        )}
                         {getStatusBadge(submission.status)}
                       </div>
                     </div>

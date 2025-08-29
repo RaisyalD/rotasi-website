@@ -301,6 +301,17 @@ export function AcaraDashboard() {
     return submissions.filter(sub => sub.sector === sectorNumber)
   }
 
+  const isSubmissionLate = (task: Task, submittedAt: string) => {
+    try {
+      const submitted = new Date(submittedAt)
+      const deadline = new Date(task.due_date)
+      deadline.setHours(23, 59, 59, 999)
+      return submitted.getTime() > deadline.getTime()
+    } catch {
+      return false
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -509,6 +520,9 @@ export function AcaraDashboard() {
                                   </p>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                  {isSubmissionLate(submission.tasks, submission.submitted_at) && (
+                                    <Badge variant="destructive">Terlambat</Badge>
+                                  )}
                                   <Badge variant={submission.status === 'submitted' ? 'secondary' : submission.status === 'evaluated' ? 'default' : 'destructive'}>
                                     {submission.status === 'submitted' ? 'Pending' : submission.status === 'evaluated' ? 'Approved' : 'Rejected'}
                                   </Badge>
