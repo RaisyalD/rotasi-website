@@ -142,12 +142,12 @@ export default function Home() {
                 { title: "Pra-ROTASI", date: "Agustus 2025", desc: "Persiapan dan pengenalan awal" },
                 {
                   title: "ROTASI Tahap I",
-                  date: "September 2025",
+                  date: "Oktober 2025",
                   desc: "Pengenalan lingkungan kampus dan program studi",
                 },
                 {
                   title: "ROTASI Tahap II",
-                  date: "September 2025",
+                  date: "Oktober 2025",
                   desc: "Pembentukan karakter dan nilai-nilai dasar",
                 },
               ].map((item, index) => (
