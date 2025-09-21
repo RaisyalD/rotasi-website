@@ -61,6 +61,16 @@ export function AcaraDashboard() {
   const [bulkDeleteType, setBulkDeleteType] = useState<'all' | 'select-tasks' | null>(null)
   const [taskSelectionDialog, setTaskSelectionDialog] = useState(false)
   const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
+  
+  // Bulk edit states
+  const [bulkEditDialog, setBulkEditDialog] = useState(false)
+  const [bulkEditTaskIds, setBulkEditTaskIds] = useState<string[]>([])
+  const [bulkEditData, setBulkEditData] = useState({
+    title: '',
+    description: '',
+    due_date: '',
+    status: 'active' as 'active' | 'completed' | 'cancelled'
+  })
 
   // Form states
   const [newTask, setNewTask] = useState({
@@ -323,6 +333,81 @@ export function AcaraDashboard() {
     setBulkDeleteDialog(true)
   }
 
+  // Bulk edit functions
+  const handleBulkEdit = () => {
+    setBulkEditTaskIds([])
+    setBulkEditData({
+      title: '',
+      description: '',
+      due_date: '',
+      status: 'active'
+    })
+    setBulkEditDialog(true)
+  }
+
+  const handleBulkEditTaskSelection = (taskId: string) => {
+    setBulkEditTaskIds(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    )
+  }
+
+  const handleSelectAllBulkEditTasks = () => {
+    if (bulkEditTaskIds.length === tasks.length) {
+      setBulkEditTaskIds([])
+    } else {
+      setBulkEditTaskIds(tasks.map(task => task.id))
+    }
+  }
+
+  const handleBulkUpdate = async () => {
+    if (bulkEditTaskIds.length === 0) {
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Tidak ada tugas yang dipilih' })
+      return
+    }
+
+    try {
+      const response = await fetch('/api/tasks/bulk-update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          taskIds: bulkEditTaskIds,
+          updateData: bulkEditData
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ 
+          title: 'Berhasil', 
+          description: `${bulkEditTaskIds.length} tugas berhasil diupdate` 
+        })
+        setBulkEditDialog(false)
+        setBulkEditTaskIds([])
+        setBulkEditData({
+          title: '',
+          description: '',
+          due_date: '',
+          status: 'active'
+        })
+        fetchAllData()
+      } else {
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ title: 'Gagal', description: data.error || 'Gagal mengupdate tugas' })
+      }
+    } catch (error) {
+      console.error('Error bulk updating tasks:', error)
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ title: 'Gagal', description: 'Gagal mengupdate tugas' })
+    }
+  }
+
 
   const getSectorSubmissions = (sectorNumber: number) => {
     return submissions.filter(sub => sub.sector === sectorNumber)
@@ -461,6 +546,14 @@ export function AcaraDashboard() {
                 </div>
                 <div className="flex gap-2">
                   <Button
+                    size="sm"
+                    onClick={handleBulkEdit}
+                    disabled={tasks.length === 0}
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Tugas
+                  </Button>
+                  <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => {
@@ -511,12 +604,6 @@ export function AcaraDashboard() {
                                   {task.status === 'active' ? 'Aktif' : 'Selesai'}
                                 </Badge>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button size="sm" variant="outline" onClick={() => handleEditTask(task)}>
-                                <Edit className="h-3 w-3 mr-1" />
-                                Edit
-                              </Button>
                             </div>
                           </div>
                         ))}
@@ -774,6 +861,136 @@ export function AcaraDashboard() {
             }}>
               {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Edit Dialog */}
+      <Dialog open={bulkEditDialog} onOpenChange={setBulkEditDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Tugas Massal</DialogTitle>
+            <DialogDescription>
+              Pilih tugas yang ingin diedit dan isi data yang akan diupdate
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Task Selection */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="select-all-bulk-edit"
+                    checked={bulkEditTaskIds.length === tasks.length && tasks.length > 0}
+                    onChange={handleSelectAllBulkEditTasks}
+                    className="rounded"
+                  />
+                  <label htmlFor="select-all-bulk-edit" className="font-medium">
+                    Pilih Semua ({bulkEditTaskIds.length}/{tasks.length})
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {tasks.map((task) => (
+                  <div key={task.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <input
+                      type="checkbox"
+                      id={`bulk-edit-task-${task.id}`}
+                      checked={bulkEditTaskIds.includes(task.id)}
+                      onChange={() => handleBulkEditTaskSelection(task.id)}
+                      className="mt-1 rounded"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <label htmlFor={`bulk-edit-task-${task.id}`} className="block cursor-pointer">
+                        <div className="font-medium text-sm">{task.title}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          Sektor {task.sector} • Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1 line-clamp-2">
+                          {task.description}
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Edit Form */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Data yang akan diupdate:</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="bulk-edit-title">Judul Tugas</Label>
+                  <Input
+                    id="bulk-edit-title"
+                    value={bulkEditData.title}
+                    onChange={(e) => setBulkEditData({...bulkEditData, title: e.target.value})}
+                    placeholder="Masukkan judul tugas baru"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bulk-edit-due-date">Deadline</Label>
+                  <Input
+                    id="bulk-edit-due-date"
+                    type="date"
+                    value={bulkEditData.due_date}
+                    onChange={(e) => setBulkEditData({...bulkEditData, due_date: e.target.value})}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="bulk-edit-description">Deskripsi Tugas</Label>
+                <Textarea
+                  id="bulk-edit-description"
+                  value={bulkEditData.description}
+                  onChange={(e) => setBulkEditData({...bulkEditData, description: e.target.value})}
+                  placeholder="Masukkan deskripsi tugas baru"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="bulk-edit-status">Status</Label>
+                <Select
+                  value={bulkEditData.status}
+                  onValueChange={(value: 'active' | 'completed' | 'cancelled') => 
+                    setBulkEditData({...bulkEditData, status: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Aktif</SelectItem>
+                    <SelectItem value="completed">Selesai</SelectItem>
+                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4">
+            <div className="text-sm text-gray-500">
+              {bulkEditTaskIds.length} tugas dipilih
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setBulkEditDialog(false)}>
+                Batal
+              </Button>
+              <Button 
+                onClick={handleBulkUpdate}
+                disabled={bulkEditTaskIds.length === 0}
+              >
+                Update {bulkEditTaskIds.length} Tugas
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
