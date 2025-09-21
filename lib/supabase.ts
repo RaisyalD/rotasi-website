@@ -183,14 +183,14 @@ export const authService = {
 
   // Login functions
   async loginPeserta(data: {
-    nama_lengkap: string
+    email: string
     sektor: number
     sectorPassword: string
   }) {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('nama_lengkap', data.nama_lengkap)
+      .eq('email', data.email)
       .eq('sektor', data.sektor)
       .eq('role', 'peserta')
       .eq('password_hash', data.sectorPassword)
@@ -205,14 +205,14 @@ export const authService = {
   },
 
   async loginMentor(data: {
-    nama_lengkap: string
+    email: string
     sektor: number
     loginPassword: string
   }) {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('nama_lengkap', data.nama_lengkap)
+      .eq('email', data.email)
       .eq('sektor', data.sektor)
       .eq('role', 'mentor')
       .eq('login_password_hash', data.loginPassword)
@@ -227,14 +227,14 @@ export const authService = {
   },
 
   async loginDivisi(data: {
-    nama_lengkap: string
+    email: string
     loginPassword: string
     role: 'acara' | 'komdis'
   }) {
     const { data: user, error } = await supabase
       .from('users')
       .select('*')
-      .eq('nama_lengkap', data.nama_lengkap)
+      .eq('email', data.email)
       .eq('role', data.role)
       .eq('login_password_hash', data.loginPassword)
       .eq('is_active', true)

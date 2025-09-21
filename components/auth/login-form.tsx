@@ -27,7 +27,7 @@ export function LoginForm() {
 
   // Form states
   const [formData, setFormData] = useState({
-    nama_lengkap: '',
+    email: '',
     sektor: '',
     sectorPassword: '',
     loginPassword: ''
@@ -75,7 +75,7 @@ export function LoginForm() {
     try {
       const payload = {
         userType,
-        nama_lengkap: formData.nama_lengkap,
+        email: formData.email,
         ...(userType === 'peserta' && {
           sektor: parseInt(formData.sektor),
           sectorPassword: formData.sectorPassword
@@ -115,12 +115,13 @@ export function LoginForm() {
   const renderPesertaForm = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="nama_lengkap">Nama Lengkap</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="nama_lengkap"
-          value={formData.nama_lengkap}
-          onChange={(e) => handleInputChange('nama_lengkap', e.target.value)}
-          placeholder="Masukkan nama lengkap"
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => handleInputChange('email', e.target.value)}
+          placeholder="Masukkan email"
           required
         />
       </div>
@@ -156,12 +157,13 @@ export function LoginForm() {
   const renderMentorForm = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="nama_lengkap">Nama Lengkap</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="nama_lengkap"
-          value={formData.nama_lengkap}
-          onChange={(e) => handleInputChange('nama_lengkap', e.target.value)}
-          placeholder="Masukkan nama lengkap"
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => handleInputChange('email', e.target.value)}
+          placeholder="Masukkan email"
           required
         />
       </div>
@@ -197,12 +199,13 @@ export function LoginForm() {
   const renderDivisiForm = () => (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="nama_lengkap">Nama Lengkap</Label>
+        <Label htmlFor="email">Email</Label>
         <Input
-          id="nama_lengkap"
-          value={formData.nama_lengkap}
-          onChange={(e) => handleInputChange('nama_lengkap', e.target.value)}
-          placeholder="Masukkan nama lengkap"
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => handleInputChange('email', e.target.value)}
+          placeholder="Masukkan email"
           required
         />
       </div>
@@ -264,14 +267,14 @@ export function LoginForm() {
                   </Alert>
                 )}
 
-                <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                  {isLoading ? 'Login...' : 'Login'}
-                </Button>
-              </form>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+              <Button type="submit" className="w-full mt-6" disabled={isLoading}>
+                {isLoading ? 'Login...' : 'Login'}
+              </Button>
+            </form>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
-  )
+  </div>
+)
 } 
