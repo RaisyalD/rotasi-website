@@ -57,8 +57,10 @@ export function AcaraDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [editTaskDialog, setEditTaskDialog] = useState(false)
-  const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false)
-  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null)
+  const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false)
+  const [bulkDeleteType, setBulkDeleteType] = useState<'all' | 'select-tasks' | null>(null)
+  const [taskSelectionDialog, setTaskSelectionDialog] = useState(false)
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([])
 
   // Form states
   const [newTask, setNewTask] = useState({
@@ -217,34 +219,108 @@ export function AcaraDashboard() {
     }
   }
 
-  const handleDeleteTask = (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId)
-    setTaskToDelete(task || null)
-    setDeleteConfirmDialog(true)
+
+  const handleBulkDelete = (type: 'all' | 'select-tasks') => {
+    console.log('handleBulkDelete called with type:', type)
+    console.log('Current tasks count:', tasks.length)
+    
+    if (type === 'select-tasks') {
+      setSelectedTaskIds([])
+      setTaskSelectionDialog(true)
+    } else {
+      setBulkDeleteType(type)
+      setBulkDeleteDialog(true)
+    }
   }
 
-  const confirmDeleteTask = async () => {
-    if (!taskToDelete) return
+  const confirmBulkDelete = async () => {
+    console.log('confirmBulkDelete called with bulkDeleteType:', bulkDeleteType)
+    if (!bulkDeleteType) return
 
     try {
-      const response = await fetch(`/api/tasks/${taskToDelete.id}`, {
-        method: 'DELETE'
-      })
+      let response
+      if (bulkDeleteType === 'all') {
+        // Delete all tasks
+        console.log('Deleting all tasks...')
+        response = await fetch('/api/tasks/bulk-delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ deleteAll: true })
+        })
+      } else {
+        // Delete selected tasks
+        console.log('Deleting selected tasks:', selectedTaskIds)
+        if (selectedTaskIds.length === 0) {
+          const { toast } = await import('@/hooks/use-toast')
+          toast({ 
+            title: 'Gagal', 
+            description: 'Tidak ada tugas yang dipilih' 
+          })
+          return
+        }
+        response = await fetch('/api/tasks/bulk-delete', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ taskIds: selectedTaskIds })
+        })
+      }
 
       const data = await response.json()
+      console.log('Bulk delete response:', data)
 
       if (data.success) {
         const { toast } = await import('@/hooks/use-toast')
-        toast({ title: 'Berhasil', description: 'Tugas berhasil dihapus' })
-        setDeleteConfirmDialog(false)
-        setTaskToDelete(null)
-        fetchAllData()
+        toast({ 
+          title: 'Berhasil', 
+          description: bulkDeleteType === 'all' 
+            ? 'Semua tugas berhasil dihapus' 
+            : `${selectedTaskIds.length} tugas berhasil dihapus` 
+        })
+        setBulkDeleteDialog(false)
+        setTaskSelectionDialog(false)
+        setBulkDeleteType(null)
+        setSelectedTaskIds([])
+        // Refresh data to update task count
+        await fetchAllData()
+      } else {
+        const { toast } = await import('@/hooks/use-toast')
+        toast({ 
+          title: 'Gagal', 
+          description: data.error || 'Gagal menghapus tugas' 
+        })
       }
     } catch (error) {
-      console.error('Error deleting task:', error)
+      console.error('Error bulk deleting tasks:', error)
       const { toast } = await import('@/hooks/use-toast')
       toast({ title: 'Gagal', description: 'Gagal menghapus tugas' })
     }
+  }
+
+  const handleTaskSelection = (taskId: string) => {
+    setSelectedTaskIds(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(id => id !== taskId)
+        : [...prev, taskId]
+    )
+  }
+
+  const handleSelectAllTasks = () => {
+    if (selectedTaskIds.length === tasks.length) {
+      setSelectedTaskIds([])
+    } else {
+      setSelectedTaskIds(tasks.map(task => task.id))
+    }
+  }
+
+  const confirmSelectedTasksDelete = () => {
+    if (selectedTaskIds.length === 0) return
+    setBulkDeleteType('select-tasks')
+    setTaskSelectionDialog(false)
+    setBulkDeleteDialog(true)
   }
 
 
@@ -378,8 +454,38 @@ export function AcaraDashboard() {
           {/* Tasks List grouped by sector */}
           <Card>
             <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
               <CardTitle>Daftar Tugas per Sektor</CardTitle>
-              <CardDescription>Urut sektor 1 sampai 10</CardDescription>
+                  <CardDescription>Urut sektor 1 sampai 10 • Total: {tasks.length} tugas</CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      console.log('Hapus Semua button clicked')
+                      handleBulkDelete('all')
+                    }}
+                    disabled={tasks.length === 0}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Hapus Semua Tugas
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      console.log('Hapus Tugas button clicked')
+                      handleBulkDelete('select-tasks')
+                    }}
+                    disabled={tasks.length === 0}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Hapus Tugas
+                  </Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -410,10 +516,6 @@ export function AcaraDashboard() {
                               <Button size="sm" variant="outline" onClick={() => handleEditTask(task)}>
                                 <Edit className="h-3 w-3 mr-1" />
                                 Edit
-                              </Button>
-                              <Button size="sm" variant="destructive" onClick={() => handleDeleteTask(task.id)}>
-                                <Trash2 className="h-3 w-3 mr-1" />
-                                Hapus
                               </Button>
                             </div>
                           </div>
@@ -571,21 +673,106 @@ export function AcaraDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteConfirmDialog} onOpenChange={setDeleteConfirmDialog}>
+
+      {/* Task Selection Dialog */}
+      <Dialog open={taskSelectionDialog} onOpenChange={setTaskSelectionDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Pilih Tugas yang Akan Dihapus</DialogTitle>
+            <DialogDescription>
+              Pilih tugas yang ingin dihapus dari {tasks.length} tugas yang tersedia
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="select-all"
+                  checked={selectedTaskIds.length === tasks.length && tasks.length > 0}
+                  onChange={handleSelectAllTasks}
+                  className="rounded"
+                />
+                <label htmlFor="select-all" className="font-medium">
+                  Pilih Semua ({selectedTaskIds.length}/{tasks.length})
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {tasks.map((task) => (
+                <div key={task.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <input
+                    type="checkbox"
+                    id={`task-${task.id}`}
+                    checked={selectedTaskIds.includes(task.id)}
+                    onChange={() => handleTaskSelection(task.id)}
+                    className="mt-1 rounded"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <label htmlFor={`task-${task.id}`} className="block cursor-pointer">
+                      <div className="font-medium text-sm">{task.title}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Sektor {task.sector} • Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
+                      </div>
+                      <div className="text-xs text-gray-600 mt-1 line-clamp-2">
+                        {task.description}
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center pt-4">
+            <div className="text-sm text-gray-500">
+              {selectedTaskIds.length} tugas dipilih
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setTaskSelectionDialog(false)}>
+                Batal
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={confirmSelectedTasksDelete}
+                disabled={selectedTaskIds.length === 0}
+              >
+                Hapus {selectedTaskIds.length} Tugas
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={bulkDeleteDialog} onOpenChange={(open) => {
+        console.log('Bulk delete dialog open state changed:', open)
+        setBulkDeleteDialog(open)
+      }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogTitle>Konfirmasi Hapus Massal</DialogTitle>
             <DialogDescription>
-              Apakah Anda yakin ingin menghapus tugas "{taskToDelete?.title}"?
+              {bulkDeleteType === 'all' 
+                ? `Apakah Anda yakin ingin menghapus SEMUA tugas di semua sektor? (${tasks.length} tugas)`
+                : `Apakah Anda yakin ingin menghapus ${selectedTaskIds.length} tugas yang dipilih?`
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDeleteConfirmDialog(false)}>
+            <Button variant="outline" onClick={() => {
+              console.log('Cancel button clicked')
+              setBulkDeleteDialog(false)
+            }}>
               Batal
             </Button>
-            <Button variant="destructive" onClick={confirmDeleteTask}>
-              Hapus Tugas
+            <Button variant="destructive" onClick={() => {
+              console.log('Confirm delete button clicked')
+              confirmBulkDelete()
+            }}>
+              {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
             </Button>
           </div>
         </DialogContent>
