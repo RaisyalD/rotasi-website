@@ -34,11 +34,11 @@ export function LogoutConfirmDialog({
   const getRedirectMessage = (role?: string) => {
     switch (role) {
       case 'mentor':
-        return 'Setelah logout, Anda akan diarahkan ke halaman login panitia dan harus login kembali untuk mengakses dashboard.'
+        return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login Divisi Mentor dan harus login kembali untuk mengakses dashboard.'
       case 'acara':
-        return 'Setelah logout, Anda akan diarahkan ke halaman login admin dan harus login kembali untuk mengakses dashboard.'
+        return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login Divisi Acara dan harus login kembali untuk mengakses dashboard.'
       default:
-        return 'Setelah logout, Anda akan diarahkan ke halaman login peserta dan harus login kembali untuk mengakses dashboard.'
+        return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login peserta dan harus login kembali untuk mengakses dashboard.'
     }
   }
 
@@ -50,12 +50,12 @@ export function LogoutConfirmDialog({
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
               <LogOut className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
-            <DialogTitle className="text-lg">Konfirmasi Logout</DialogTitle>
+            <DialogTitle className="text-lg">Keluar dari Akun</DialogTitle>
           </div>
           <DialogDescription className="text-base">
             {userName 
-              ? `Apakah Anda yakin ingin logout dari akun ${userName}?`
-              : 'Apakah Anda yakin ingin logout dari akun Anda?'
+              ? `Apakah Anda yakin ingin keluar dari akun ${userName}?`
+              : 'Apakah Anda yakin ingin keluar dari akun Anda?'
             }
           </DialogDescription>
         </DialogHeader>
@@ -83,7 +83,7 @@ export function LogoutConfirmDialog({
             className="min-w-[80px] flex items-center gap-2"
           >
             <LogOut className="h-4 w-4" />
-            Ya, Logout
+            Ya, Keluar
           </Button>
         </div>
       </DialogContent>
