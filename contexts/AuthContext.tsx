@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { SafeStorage, initWebViewCompatibility } from '@/lib/webview-utils'
 
 interface User {
   id: string
@@ -27,26 +28,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = (userData: User) => {
     setUser(userData)
-    localStorage.setItem('rotasi_user', JSON.stringify(userData))
+    // Safe localStorage access with webview compatibility
+    SafeStorage.setItem('rotasi_user', JSON.stringify(userData))
   }
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('rotasi_user')
+    // Safe localStorage access with webview compatibility
+    SafeStorage.removeItem('rotasi_user')
   }
 
   useEffect(() => {
     setMounted(true)
-    // Check for stored user data on app load
-    const storedUser = localStorage.getItem('rotasi_user')
+    
+    // Initialize webview compatibility
+    initWebViewCompatibility()
+    
+    // Check for stored user data on app load with webview compatibility
+    const storedUser = SafeStorage.getItem('rotasi_user')
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser))
       } catch (error) {
         console.error('Error parsing stored user:', error)
-        localStorage.removeItem('rotasi_user')
+        SafeStorage.removeItem('rotasi_user')
       }
     }
+    
     setIsLoading(false)
   }, [])
 

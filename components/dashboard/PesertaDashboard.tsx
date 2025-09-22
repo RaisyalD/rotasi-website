@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
-import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle, Edit } from 'lucide-react'
+import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle, Edit, FileIcon, X } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -54,9 +54,22 @@ export function PesertaDashboard({ user }: { user: User }) {
   })
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     fetchData()
+    
+    // Detect mobile device
+    const checkMobile = () => {
+      const isMobileDevice = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const fetchData = async () => {
@@ -85,8 +98,56 @@ export function PesertaDashboard({ user }: { user: User }) {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setUploadForm({ ...uploadForm, file: e.target.files[0] })
+      const file = e.target.files[0]
+      if (validateFile(file)) {
+        setUploadForm({ ...uploadForm, file })
+      }
     }
+  }
+
+  const validateFile = (file: File): boolean => {
+    // Validate file type
+    const isZip = file.type === 'application/zip' || file.name.toLowerCase().endsWith('.zip')
+    if (!isZip) {
+      alert('Hanya file .zip yang diperbolehkan')
+      return false
+    }
+
+    // Validate file size (10MB)
+    const maxBytes = 10 * 1024 * 1024
+    if (file.size > maxBytes) {
+      alert('Ukuran file maksimal 10MB')
+      return false
+    }
+
+    return true
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragOver(false)
+
+    const files = e.dataTransfer.files
+    if (files && files[0]) {
+      const file = files[0]
+      if (validateFile(file)) {
+        setUploadForm({ ...uploadForm, file })
+      }
+    }
+  }
+
+  const removeFile = () => {
+    setUploadForm({ ...uploadForm, file: null })
   }
 
   const handleUpload = async () => {
@@ -440,14 +501,14 @@ export function PesertaDashboard({ user }: { user: User }) {
           setUploadProgress(0)
         }
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] mx-4 sm:mx-auto">
           <DialogHeader>
             <DialogTitle>{editingSubmission ? 'Edit Tugas' : 'Upload Tugas'}</DialogTitle>
             <DialogDescription>
               {selectedTask?.title}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[calc(90vh-120px)] overflow-y-auto pr-2">
             <div>
               <Label htmlFor="submission-text">Deskripsi Tugas (Opsional)</Label>
               <Textarea
@@ -460,15 +521,119 @@ export function PesertaDashboard({ user }: { user: User }) {
             </div>
             <div>
               <Label htmlFor="file-upload">Upload File Tugas (ZIP)</Label>
+              
+              {/* Drag and Drop Area - Hidden on Mobile */}
+              {!isMobile && (
+                <div
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    isDragOver
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : uploadForm.file
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                {uploadForm.file ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <FileIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                      <div className="text-left">
+                        <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                          {uploadForm.file.name}
+                        </p>
+                        <p className="text-xs text-green-600 dark:text-green-400">
+                          {(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={removeFile}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      File siap diupload. Klik "Upload Tugas" untuk melanjutkan.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Upload className="h-12 w-12 mx-auto text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {isDragOver ? 'Lepas file di sini' : 'Drag & drop file ZIP atau klik untuk memilih'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Format: ZIP • Maksimal: 10MB
+                      </p>
+                    </div>
+                  </div>
+                )}
+                </div>
+              )}
+
+              {/* Mobile File Preview - Only show when file is selected on mobile */}
+              {isMobile && uploadForm.file && (
+                <div className="border-2 border-green-500 bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <FileIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                    <div className="text-left">
+                      <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                        {uploadForm.file.name}
+                      </p>
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        {(uploadForm.file.size / (1024 * 1024)).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={removeFile}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    File siap diupload. Klik "Upload Tugas" untuk melanjutkan.
+                  </p>
+                </div>
+              )}
+
+              {/* Hidden file input */}
               <Input
                 id="file-upload"
                 type="file"
                 accept=".zip"
                 onChange={handleFileChange}
+                className="hidden"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Upload tugas dalam format ZIP. Maksimal 10MB.
-              </p>
+
+              {/* Choose file button */}
+              <div className="mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  className="w-full min-h-[44px]"
+                >
+                  <FileIcon className="h-4 w-4 mr-2" />
+                  {uploadForm.file ? 'Pilih File Lain' : 'Pilih File'}
+                </Button>
+                {isMobile && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Format: ZIP • Maksimal: 10MB
+                  </p>
+                )}
+              </div>
             </div>
             
             {/* Progress Bar */}
@@ -487,11 +652,19 @@ export function PesertaDashboard({ user }: { user: User }) {
               </div>
             )}
             
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setUploadDialog(false)}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => setUploadDialog(false)}
+                className="w-full sm:w-auto min-h-[44px]"
+              >
                 Batal
               </Button>
-              <Button onClick={handleUpload} disabled={isUploading}>
+              <Button 
+                onClick={handleUpload} 
+                disabled={isUploading}
+                className="w-full sm:w-auto min-h-[44px]"
+              >
                 {isUploading ? (editingSubmission ? 'Mengupdate...' : 'Mengupload...') : (editingSubmission ? 'Update Tugas' : 'Upload Tugas')}
               </Button>
             </div>

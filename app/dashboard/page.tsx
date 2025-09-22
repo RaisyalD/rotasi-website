@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -10,10 +10,12 @@ import { Users, GraduationCap, Calendar, Shield, LogOut, User, Mail, Hash } from
 import { PesertaDashboard } from '@/components/dashboard/PesertaDashboard'
 import { MentorDashboard } from '@/components/dashboard/MentorDashboard'
 import { AcaraDashboard } from '@/components/dashboard/AcaraDashboard'
+import { LogoutConfirmDialog } from '@/components/LogoutConfirmDialog'
 
 export default function DashboardPage() {
   const { user, logout, isLoading } = useAuth()
   const router = useRouter()
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -41,6 +43,10 @@ export default function DashboardPage() {
     }
     logout()
     router.push('/')
+  }
+
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true)
   }
 
   const getRoleIcon = (role: string) => {
@@ -97,7 +103,7 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold">Dashboard ROTASI</h1>
             <p className="text-muted-foreground">Selamat datang di platform ROTASI</p>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
+          <Button onClick={handleLogoutClick} variant="outline" className="flex items-center gap-2">
             <LogOut className="h-4 w-4" />
             Logout
           </Button>
@@ -154,6 +160,14 @@ export default function DashboardPage() {
 
         {user.role === 'acara' && <AcaraDashboard />}
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+        userName={user?.nama_lengkap}
+      />
     </div>
   )
 } 

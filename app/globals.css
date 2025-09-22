@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* WebView compatibility styles */
+.webview-environment {
+  /* Ensure proper scrolling in webview */
+  -webkit-overflow-scrolling: touch;
+  
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Improve touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Prevent text selection issues */
+  * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Allow text selection in input fields */
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

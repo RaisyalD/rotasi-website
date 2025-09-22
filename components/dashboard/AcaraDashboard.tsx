@@ -10,10 +10,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download } from 'lucide-react'
+import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download, RefreshCw } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { safeFetch } from '@/lib/webview-utils'
 
 interface SectorData {
   sector_number: number
@@ -87,15 +88,15 @@ export function AcaraDashboard() {
   const fetchAllData = async () => {
     try {
       // Fetch sectors data
-      const sectorsResponse = await fetch('/api/sectors')
+      const sectorsResponse = await safeFetch('/api/sectors')
       const sectorsData = await sectorsResponse.json()
       
       if (sectorsData.success) {
         const sectorsWithData = await Promise.all(
           sectorsData.sectors.map(async (sector: any) => {
             const [participantsRes, mentorsRes] = await Promise.all([
-              fetch(`/api/users?role=peserta&sektor=${sector.sector_number}`),
-              fetch(`/api/users?role=mentor&sektor=${sector.sector_number}`)
+              safeFetch(`/api/users?role=peserta&sektor=${sector.sector_number}`),
+              safeFetch(`/api/users?role=mentor&sektor=${sector.sector_number}`)
             ])
             
             const participantsData = await participantsRes.json()
@@ -114,7 +115,7 @@ export function AcaraDashboard() {
       }
 
       // Fetch tasks
-      const tasksResponse = await fetch('/api/tasks')
+      const tasksResponse = await safeFetch('/api/tasks')
       const tasksData = await tasksResponse.json()
       
       if (tasksData.success) {
@@ -122,7 +123,7 @@ export function AcaraDashboard() {
       }
 
       // Fetch submissions
-      const submissionsResponse = await fetch('/api/submissions')
+      const submissionsResponse = await safeFetch('/api/submissions')
       const submissionsData = await submissionsResponse.json()
       
       if (submissionsData.success) {
@@ -130,6 +131,13 @@ export function AcaraDashboard() {
       }
     } catch (error) {
       console.error('Error fetching data:', error)
+      // Show user-friendly error message
+      const { toast } = await import('@/hooks/use-toast')
+      toast({ 
+        title: 'Error', 
+        description: 'Gagal memuat data. Periksa koneksi internet Anda.',
+        variant: 'destructive'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -433,6 +441,23 @@ export function AcaraDashboard() {
     )
   }
 
+  // Error state - show if no data and not loading
+  if (!isLoading && sectors.length === 0 && tasks.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <AlertTriangle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold mb-2">Tidak dapat memuat data</h3>
+        <p className="text-muted-foreground mb-4">
+          Terjadi masalah saat memuat data. Silakan coba lagi.
+        </p>
+        <Button onClick={fetchAllData} variant="outline">
+          <RefreshCw className="h-4 w-4 mr-2" />
+          Coba Lagi
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -539,19 +564,21 @@ export function AcaraDashboard() {
           {/* Tasks List grouped by sector */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="space-y-4">
                 <div>
-              <CardTitle>Daftar Tugas per Sektor</CardTitle>
+                  <CardTitle>Daftar Tugas per Sektor</CardTitle>
                   <CardDescription>Urut sektor 1 sampai 10 • Total: {tasks.length} tugas</CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
                     onClick={handleBulkEdit}
                     disabled={tasks.length === 0}
+                    className="flex-shrink-0"
                   >
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit Tugas
+                    <span className="hidden sm:inline">Edit Tugas</span>
+                    <span className="sm:hidden">Edit</span>
                   </Button>
                   <Button
                     variant="destructive"
@@ -561,9 +588,11 @@ export function AcaraDashboard() {
                       handleBulkDelete('all')
                     }}
                     disabled={tasks.length === 0}
+                    className="flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Hapus Semua Tugas
+                    <span className="hidden sm:inline">Hapus Semua Tugas</span>
+                    <span className="sm:hidden">Hapus Semua</span>
                   </Button>
                   <Button
                     variant="destructive"
@@ -573,9 +602,11 @@ export function AcaraDashboard() {
                       handleBulkDelete('select-tasks')
                     }}
                     disabled={tasks.length === 0}
+                    className="flex-shrink-0"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Hapus Tugas
+                    <span className="hidden sm:inline">Hapus Tugas</span>
+                    <span className="sm:hidden">Hapus</span>
                   </Button>
                 </div>
               </div>
@@ -748,11 +779,18 @@ export function AcaraDashboard() {
                 onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
               />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setEditTaskDialog(false)}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setEditTaskDialog(false)}
+                className="w-full sm:w-auto"
+              >
                 Batal
               </Button>
-              <Button onClick={handleUpdateTask}>
+              <Button 
+                onClick={handleUpdateTask}
+                className="w-full sm:w-auto"
+              >
                 Update Tugas
               </Button>
             </div>
@@ -763,7 +801,7 @@ export function AcaraDashboard() {
 
       {/* Task Selection Dialog */}
       <Dialog open={taskSelectionDialog} onOpenChange={setTaskSelectionDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto mx-4">
           <DialogHeader>
             <DialogTitle>Pilih Tugas yang Akan Dihapus</DialogTitle>
             <DialogDescription>
@@ -779,7 +817,7 @@ export function AcaraDashboard() {
                   id="select-all"
                   checked={selectedTaskIds.length === tasks.length && tasks.length > 0}
                   onChange={handleSelectAllTasks}
-                  className="rounded"
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="select-all" className="font-medium">
                   Pilih Semua ({selectedTaskIds.length}/{tasks.length})
@@ -795,7 +833,7 @@ export function AcaraDashboard() {
                     id={`task-${task.id}`}
                     checked={selectedTaskIds.includes(task.id)}
                     onChange={() => handleTaskSelection(task.id)}
-                    className="mt-1 rounded"
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div className="flex-1 min-w-0">
                     <label htmlFor={`task-${task.id}`} className="block cursor-pointer">
@@ -813,20 +851,26 @@ export function AcaraDashboard() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center pt-4">
-            <div className="text-sm text-gray-500">
+          <div className="space-y-4 pt-4">
+            <div className="text-sm text-gray-500 text-center sm:text-left">
               {selectedTaskIds.length} tugas dipilih
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setTaskSelectionDialog(false)}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setTaskSelectionDialog(false)}
+                className="w-full sm:w-auto"
+              >
                 Batal
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={confirmSelectedTasksDelete}
                 disabled={selectedTaskIds.length === 0}
+                className="w-full sm:w-auto"
               >
-                Hapus {selectedTaskIds.length} Tugas
+                <span className="hidden sm:inline">Hapus {selectedTaskIds.length} Tugas</span>
+                <span className="sm:hidden">Hapus {selectedTaskIds.length}</span>
               </Button>
             </div>
           </div>
@@ -848,18 +892,31 @@ export function AcaraDashboard() {
               }
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => {
-              console.log('Cancel button clicked')
-              setBulkDeleteDialog(false)
-            }}>
+          <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                console.log('Cancel button clicked')
+                setBulkDeleteDialog(false)
+              }}
+              className="w-full sm:w-auto"
+            >
               Batal
             </Button>
-            <Button variant="destructive" onClick={() => {
-              console.log('Confirm delete button clicked')
-              confirmBulkDelete()
-            }}>
-              {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
+            <Button 
+              variant="destructive" 
+              onClick={() => {
+                console.log('Confirm delete button clicked')
+                confirmBulkDelete()
+              }}
+              className="w-full sm:w-auto"
+            >
+              <span className="hidden sm:inline">
+                {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
+              </span>
+              <span className="sm:hidden">
+                {bulkDeleteType === 'all' ? 'Hapus Semua' : 'Hapus'}
+              </span>
             </Button>
           </div>
         </DialogContent>
@@ -867,7 +924,7 @@ export function AcaraDashboard() {
 
       {/* Bulk Edit Dialog */}
       <Dialog open={bulkEditDialog} onOpenChange={setBulkEditDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto mx-4">
           <DialogHeader>
             <DialogTitle>Edit Tugas Massal</DialogTitle>
             <DialogDescription>
@@ -885,7 +942,7 @@ export function AcaraDashboard() {
                     id="select-all-bulk-edit"
                     checked={bulkEditTaskIds.length === tasks.length && tasks.length > 0}
                     onChange={handleSelectAllBulkEditTasks}
-                    className="rounded"
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <label htmlFor="select-all-bulk-edit" className="font-medium">
                     Pilih Semua ({bulkEditTaskIds.length}/{tasks.length})
@@ -896,13 +953,13 @@ export function AcaraDashboard() {
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {tasks.map((task) => (
                   <div key={task.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
-                    <input
-                      type="checkbox"
-                      id={`bulk-edit-task-${task.id}`}
-                      checked={bulkEditTaskIds.includes(task.id)}
-                      onChange={() => handleBulkEditTaskSelection(task.id)}
-                      className="mt-1 rounded"
-                    />
+                  <input
+                    type="checkbox"
+                    id={`bulk-edit-task-${task.id}`}
+                    checked={bulkEditTaskIds.includes(task.id)}
+                    onChange={() => handleBulkEditTaskSelection(task.id)}
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`bulk-edit-task-${task.id}`} className="block cursor-pointer">
                         <div className="font-medium text-sm">{task.title}</div>
@@ -976,19 +1033,25 @@ export function AcaraDashboard() {
             </div>
           </div>
 
-          <div className="flex justify-between items-center pt-4">
-            <div className="text-sm text-gray-500">
+          <div className="space-y-4 pt-4">
+            <div className="text-sm text-gray-500 text-center sm:text-left">
               {bulkEditTaskIds.length} tugas dipilih
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setBulkEditDialog(false)}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setBulkEditDialog(false)}
+                className="w-full sm:w-auto"
+              >
                 Batal
               </Button>
               <Button 
                 onClick={handleBulkUpdate}
                 disabled={bulkEditTaskIds.length === 0}
+                className="w-full sm:w-auto"
               >
-                Update {bulkEditTaskIds.length} Tugas
+                <span className="hidden sm:inline">Update {bulkEditTaskIds.length} Tugas</span>
+                <span className="sm:hidden">Update {bulkEditTaskIds.length}</span>
               </Button>
             </div>
           </div>

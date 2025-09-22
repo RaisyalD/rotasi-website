@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRouter } from "next/navigation"
+import { LogoutConfirmDialog } from "@/components/LogoutConfirmDialog"
 
 const navLinks = [
   { name: "Beranda", href: "/" },
@@ -22,6 +23,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const { user, logout } = useAuth()
   const router = useRouter()
 
@@ -43,6 +45,10 @@ export function Navbar() {
     logout()
     setIsOpen(false)
     router.push('/')
+  }
+
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true)
   }
 
   // Don't render scroll-dependent classes until mounted
@@ -93,7 +99,7 @@ export function Navbar() {
                       Dashboard
                     </Link>
                     <button 
-                      onClick={handleLogout}
+                      onClick={handleLogoutClick}
                       className="block w-full text-left px-4 py-2 text-sm hover:bg-accent text-red-600"
                     >
                       <LogOut className="h-4 w-4 inline mr-2" />
@@ -151,7 +157,7 @@ export function Navbar() {
                 </Link>
                 <button 
                   onClick={() => {
-                    handleLogout()
+                    handleLogoutClick()
                     setIsOpen(false)
                   }}
                   className="block w-full text-left py-2 text-sm hover:text-primary text-red-600"
@@ -173,6 +179,14 @@ export function Navbar() {
           </div>
         </nav>
       )}
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+        userName={user?.nama_lengkap}
+      />
     </header>
   )
 }

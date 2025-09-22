@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
+import ErrorBoundary from "@/components/ErrorBoundary"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,16 +39,18 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/favicon.ico" />
       </head>
       <body className={`${inter.variable} ${bebasNeue.variable} font-sans bg-background`} suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-          <AuthProvider>
-            <div className="flex min-h-screen flex-col">
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <Toaster />
-            </div>
-          </AuthProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+            <AuthProvider>
+              <div className="flex min-h-screen flex-col">
+                <Navbar />
+                <main className="flex-1">{children}</main>
+                <Footer />
+                <Toaster />
+              </div>
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
