@@ -7,10 +7,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/contexts/AuthContext'
-import { Users, GraduationCap, Calendar } from 'lucide-react'
 
 interface Sector {
   sector_number: number
@@ -20,7 +18,6 @@ interface Sector {
 export function LoginForm() {
   const router = useRouter()
   const { login } = useAuth()
-  const [userType, setUserType] = useState<'peserta' | 'mentor' | 'acara'>('peserta')
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -29,8 +26,7 @@ export function LoginForm() {
   const [formData, setFormData] = useState({
     email: '',
     sektor: '',
-    sectorPassword: '',
-    loginPassword: ''
+    sectorPassword: ''
   })
 
   useEffect(() => {
@@ -74,19 +70,10 @@ export function LoginForm() {
 
     try {
       const payload = {
-        userType,
+        userType: 'peserta',
         email: formData.email,
-        ...(userType === 'peserta' && {
-          sektor: parseInt(formData.sektor),
-          sectorPassword: formData.sectorPassword
-        }),
-        ...(userType === 'mentor' && {
-          sektor: parseInt(formData.sektor),
-          loginPassword: formData.loginPassword
-        }),
-        ...(userType === 'acara' && {
-          loginPassword: formData.loginPassword
-        })
+        sektor: parseInt(formData.sektor),
+        sectorPassword: formData.sectorPassword
       }
 
       const response = await fetch('/api/auth/login', {
@@ -154,127 +141,34 @@ export function LoginForm() {
     </div>
   )
 
-  const renderMentorForm = () => (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          placeholder="Masukkan email"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="sektor">Pilih Sektor</Label>
-        <Select value={formData.sektor} onValueChange={(value) => handleInputChange('sektor', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih sektor" />
-          </SelectTrigger>
-          <SelectContent>
-            {sectors.map((sector) => (
-              <SelectItem key={sector.sector_number} value={sector.sector_number.toString()}>
-                {sector.sector_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="loginPassword">Password Login</Label>
-        <Input
-          id="loginPassword"
-          type="password"
-          value={formData.loginPassword}
-          onChange={(e) => handleInputChange('loginPassword', e.target.value)}
-          placeholder="Masukkan password login"
-          required
-        />
-      </div>
-    </div>
-  )
-
-  const renderDivisiForm = () => (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          placeholder="Masukkan email"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="loginPassword">Password Login</Label>
-        <Input
-          id="loginPassword"
-          type="password"
-          value={formData.loginPassword}
-          onChange={(e) => handleInputChange('loginPassword', e.target.value)}
-          placeholder="Masukkan password login"
-          required
-        />
-      </div>
-    </div>
-  )
 
   return (
     <div className="container mx-auto px-4 py-8 pt-32">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Login ROTASI</CardTitle>
+            <CardTitle className="text-2xl">Login Peserta ROTASI</CardTitle>
             <CardDescription>
-              Pilih tipe user dan masukkan data untuk login
+              Masukkan data untuk login sebagai peserta
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs value={userType} onValueChange={(value) => setUserType(value as any)}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="peserta" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Peserta
-                </TabsTrigger>
-                <TabsTrigger value="mentor" className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  Panitia
-                </TabsTrigger>
-                <TabsTrigger value="acara" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Admin
-                </TabsTrigger>
-              </TabsList>
+            <form onSubmit={handleSubmit} className="mt-6">
+              {renderPesertaForm()}
 
-              <form onSubmit={handleSubmit} className="mt-6">
-                <TabsContent value="peserta">
-                  {renderPesertaForm()}
-                </TabsContent>
-                <TabsContent value="mentor">
-                  {renderMentorForm()}
-                </TabsContent>
-                <TabsContent value="acara">
-                  {renderDivisiForm()}
-                </TabsContent>
-
-                {error && (
-                  <Alert className="mt-4" variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+              {error && (
+                <Alert className="mt-4" variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
               <Button type="submit" className="w-full mt-6" disabled={isLoading}>
                 {isLoading ? 'Login...' : 'Login'}
               </Button>
             </form>
-          </Tabs>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>
-)
+  )
 } 

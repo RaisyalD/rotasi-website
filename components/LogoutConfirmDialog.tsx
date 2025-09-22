@@ -16,17 +16,30 @@ interface LogoutConfirmDialogProps {
   onClose: () => void
   onConfirm: () => void
   userName?: string
+  userRole?: string
 }
 
 export function LogoutConfirmDialog({ 
   isOpen, 
   onClose, 
   onConfirm, 
-  userName 
+  userName,
+  userRole 
 }: LogoutConfirmDialogProps) {
   const handleConfirm = () => {
     onConfirm()
     onClose()
+  }
+
+  const getRedirectMessage = (role?: string) => {
+    switch (role) {
+      case 'mentor':
+        return 'Setelah logout, Anda akan diarahkan ke halaman login panitia dan harus login kembali untuk mengakses dashboard.'
+      case 'acara':
+        return 'Setelah logout, Anda akan diarahkan ke halaman login admin dan harus login kembali untuk mengakses dashboard.'
+      default:
+        return 'Setelah logout, Anda akan diarahkan ke halaman login peserta dan harus login kembali untuk mengakses dashboard.'
+    }
   }
 
   return (
@@ -51,7 +64,7 @@ export function LogoutConfirmDialog({
           <div className="flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
-              Setelah logout, Anda akan diarahkan ke halaman beranda dan harus login kembali untuk mengakses dashboard.
+              {getRedirectMessage(userRole)}
             </p>
           </div>
         </div>

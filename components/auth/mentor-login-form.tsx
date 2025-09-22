@@ -9,27 +9,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/contexts/AuthContext'
+import { GraduationCap } from 'lucide-react'
 
 interface Sector {
   sector_number: number
   sector_name: string
 }
 
-export function RegisterForm() {
+export function MentorLoginForm() {
   const router = useRouter()
   const { login } = useAuth()
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
 
   // Form states
   const [formData, setFormData] = useState({
-    nama_lengkap: '',
     email: '',
-    nim: '',
     sektor: '',
-    sectorPassword: ''
+    loginPassword: ''
   })
 
   useEffect(() => {
@@ -70,19 +68,16 @@ export function RegisterForm() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-    setSuccess('')
 
     try {
       const payload = {
-        userType: 'peserta',
-        nama_lengkap: formData.nama_lengkap,
-        nim: formData.nim,
+        userType: 'mentor',
         email: formData.email,
         sektor: parseInt(formData.sektor),
-        sectorPassword: formData.sectorPassword
+        loginPassword: formData.loginPassword
       }
 
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -93,97 +88,72 @@ export function RegisterForm() {
       const data = await response.json()
 
       if (data.success) {
-        setSuccess('Registrasi berhasil!')
         login(data.user)
-        setTimeout(() => {
-          router.push('/dashboard')
-        }, 1500)
+        router.push('/dashboard')
       } else {
         setError(data.error)
       }
     } catch (error) {
-      setError('Terjadi kesalahan saat registrasi')
+      setError('Terjadi kesalahan saat login')
     } finally {
       setIsLoading(false)
     }
   }
-
-  const renderPesertaForm = () => (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="nama_lengkap">Nama Lengkap</Label>
-        <Input
-          id="nama_lengkap"
-          value={formData.nama_lengkap}
-          onChange={(e) => handleInputChange('nama_lengkap', e.target.value)}
-          placeholder="Masukkan nama lengkap"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="nim">NIM</Label>
-        <Input
-          id="nim"
-          value={formData.nim}
-          onChange={(e) => handleInputChange('nim', e.target.value)}
-          placeholder="Masukkan NIM"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          value={formData.email}
-          onChange={(e) => handleInputChange('email', e.target.value)}
-          placeholder="Masukkan email"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="sektor">Pilih Sektor</Label>
-        <Select value={formData.sektor} onValueChange={(value) => handleInputChange('sektor', value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih sektor" />
-          </SelectTrigger>
-          <SelectContent>
-            {sectors.map((sector) => (
-              <SelectItem key={sector.sector_number} value={sector.sector_number.toString()}>
-                {sector.sector_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="sectorPassword">Password Sektor</Label>
-        <Input
-          id="sectorPassword"
-          type="password"
-          value={formData.sectorPassword}
-          onChange={(e) => handleInputChange('sectorPassword', e.target.value)}
-          placeholder="Masukkan password sektor"
-          required
-        />
-      </div>
-    </div>
-  )
-
 
   return (
     <div className="container mx-auto px-4 py-8 pt-32">
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Daftar Peserta ROTASI</CardTitle>
+            <CardTitle className="text-2xl flex items-center justify-center gap-2">
+              <GraduationCap className="h-6 w-6" />
+              Login Panitia ROTASI
+            </CardTitle>
             <CardDescription>
-              Lengkapi data untuk mendaftar sebagai peserta
+              Masukkan data untuk login sebagai panitia
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="mt-6">
-              {renderPesertaForm()}
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    placeholder="Masukkan email"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sektor">Pilih Sektor</Label>
+                  <Select value={formData.sektor} onValueChange={(value) => handleInputChange('sektor', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Pilih sektor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sectors.map((sector) => (
+                        <SelectItem key={sector.sector_number} value={sector.sector_number.toString()}>
+                          {sector.sector_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="loginPassword">Password Login</Label>
+                  <Input
+                    id="loginPassword"
+                    type="password"
+                    value={formData.loginPassword}
+                    onChange={(e) => handleInputChange('loginPassword', e.target.value)}
+                    placeholder="Masukkan password login"
+                    required
+                  />
+                </div>
+              </div>
 
               {error && (
                 <Alert className="mt-4" variant="destructive">
@@ -191,14 +161,8 @@ export function RegisterForm() {
                 </Alert>
               )}
 
-              {success && (
-                <Alert className="mt-4">
-                  <AlertDescription>{success}</AlertDescription>
-                </Alert>
-              )}
-
               <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-                {isLoading ? 'Mendaftar...' : 'Daftar Sekarang'}
+                {isLoading ? 'Login...' : 'Login'}
               </Button>
             </form>
           </CardContent>
@@ -206,4 +170,4 @@ export function RegisterForm() {
       </div>
     </div>
   )
-} 
+}

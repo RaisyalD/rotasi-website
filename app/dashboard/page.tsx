@@ -16,12 +16,13 @@ export default function DashboardPage() {
   const { user, logout, isLoading } = useAuth()
   const router = useRouter()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !user && !isLoggingOut) {
       router.push('/auth/login')
     }
-  }, [user, isLoading, router])
+  }, [user, isLoading, router, isLoggingOut])
 
   if (isLoading) {
     return (
@@ -36,13 +37,28 @@ export default function DashboardPage() {
   }
 
   const handleLogout = async () => {
+    setIsLoggingOut(true)
+    
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
     } catch (e) {
       // ignore
     }
+    
+    // Store user role before logout clears it
+    const userRole = user?.role
+    
     logout()
-    router.push('/')
+    
+    // Use window.location.href for direct redirect to avoid interference
+    if (userRole === 'mentor') {
+      window.location.href = '/auth/login-mentor'
+    } else if (userRole === 'acara') {
+      window.location.href = '/auth/login-acara'
+    } else {
+      // Default to peserta login page
+      window.location.href = '/auth/login'
+    }
   }
 
   const handleLogoutClick = () => {
@@ -162,12 +178,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Logout Confirmation Dialog */}
-      <LogoutConfirmDialog
-        isOpen={showLogoutDialog}
-        onClose={() => setShowLogoutDialog(false)}
-        onConfirm={handleLogout}
-        userName={user?.nama_lengkap}
-      />
+        <LogoutConfirmDialog
+          isOpen={showLogoutDialog}
+          onClose={() => setShowLogoutDialog(false)}
+          onConfirm={handleLogout}
+          userName={user?.nama_lengkap}
+          userRole={user?.role}
+        />
     </div>
   )
 } 

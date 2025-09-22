@@ -42,9 +42,22 @@ export function Navbar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' })
     } catch {}
+    
+    // Store user role before logout clears it
+    const userRole = user?.role
+    
     logout()
     setIsOpen(false)
-    router.push('/')
+    
+    // Use window.location.href for direct redirect to avoid interference
+    if (userRole === 'mentor') {
+      window.location.href = '/auth/login-mentor'
+    } else if (userRole === 'acara') {
+      window.location.href = '/auth/login-acara'
+    } else {
+      // Default to peserta login page
+      window.location.href = '/auth/login'
+    }
   }
 
   const handleLogoutClick = () => {
@@ -186,6 +199,7 @@ export function Navbar() {
         onClose={() => setShowLogoutDialog(false)}
         onConfirm={handleLogout}
         userName={user?.nama_lengkap}
+        userRole={user?.role}
       />
     </header>
   )
