@@ -44,6 +44,7 @@ export function PesertaDashboard({ user }: { user: User }) {
   const { user: currentUser } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
+  const [mentor, setMentor] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [uploadDialog, setUploadDialog] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
@@ -88,6 +89,20 @@ export function PesertaDashboard({ user }: { user: User }) {
       
       if (submissionsData.success) {
         setSubmissions(submissionsData.submissions)
+      }
+
+      // Fetch mentor for user's sector
+      const mentorResponse = await fetch(`/api/mentor?sektor=${user.sektor}`)
+      const mentorData = await mentorResponse.json()
+      
+      console.log('Mentor API Response:', mentorData) // Debug log
+      
+      if (mentorData.success && mentorData.mentors.length > 0) {
+        console.log('Setting mentor:', mentorData.mentors[0]) // Debug log
+        setMentor(mentorData.mentors[0]) // Take the first mentor if multiple
+      } else {
+        console.log('No mentor found for sector:', user.sektor) // Debug log
+        setMentor(null)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -305,7 +320,7 @@ export function PesertaDashboard({ user }: { user: User }) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tugas</CardTitle>
@@ -330,6 +345,21 @@ export function PesertaDashboard({ user }: { user: User }) {
             </div>
             <p className="text-xs text-muted-foreground">
               dari total tugas
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Mentor Sektor</CardTitle>
+            <GraduationCap className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-lg font-semibold">
+              {mentor ? mentor.nama_lengkap : 'Belum ditentukan'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Sektor {user.sektor}
             </p>
           </CardContent>
         </Card>
