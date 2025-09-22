@@ -95,7 +95,7 @@ export function LoginForm() {
         const motivationalMessages = [
           "Tetap semangat jalani harimu!",
           "Jangan lupa makan dan minum ya untuk penuhi energimu!",
-          "Tetap senyum meskipun kamu lelah.",
+          "Tetaplah senyum meskipun tidak bahagia.",
           "Jangan lupa untuk jaga kesehatan ya!"
         ]
         

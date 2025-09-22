@@ -40,6 +40,7 @@ interface TaskSubmission {
   tasks: Task
 }
 
+
 export function PesertaDashboard({ user }: { user: User }) {
   const { user: currentUser } = useAuth()
   const [tasks, setTasks] = useState<Task[]>([])
@@ -104,6 +105,7 @@ export function PesertaDashboard({ user }: { user: User }) {
         console.log('No mentor found for sector:', user.sektor) // Debug log
         setMentor(null)
       }
+
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -293,7 +295,7 @@ export function PesertaDashboard({ user }: { user: User }) {
   }
 
   const getTaskStatusIcon = (status: string) => {
-    return <FileText className="h-4 w-4 text-gray-500" />
+    return <FileText className="h-4 w-4 text-muted-foreground" />
   }
 
   const isSubmissionLate = (task: Task, submittedAt: string) => {
@@ -391,7 +393,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                   const submission = submissions.find(sub => sub.task_id === task.id)
                   
                   return (
-                    <div key={task.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                    <div key={task.id} className="border rounded-lg p-4 bg-card">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                           {getTaskStatusIcon(taskStatus)}
@@ -479,7 +481,7 @@ export function PesertaDashboard({ user }: { user: User }) {
             <CardContent>
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                  <div key={submission.id} className="border rounded-lg p-4 bg-card">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{submission.tasks.title}</h3>

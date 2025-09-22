@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { useAuth } from "@/contexts/AuthContext"
 import { useRouter, usePathname } from "next/navigation"
 import { LogoutConfirmDialog } from "@/components/LogoutConfirmDialog"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { name: "Beranda", href: "/" },
@@ -70,6 +71,12 @@ export function Navbar() {
                                    pathname?.startsWith('/auth/register-acara') ||
                                    pathname?.startsWith('/auth/login-mentor') || 
                                    pathname?.startsWith('/auth/register-mentor')
+  
+  // Check if we're on homepage (where navbar should be white when not scrolled)
+  const isHomePage = pathname === '/'
+  
+  // Check if we're on auth pages (login, register) or dashboard pages
+  const isAuthOrDashboardPage = pathname?.startsWith('/auth') || pathname?.startsWith('/dashboard')
 
   // Don't render scroll-dependent classes until mounted
   const headerClasses = mounted 
@@ -91,7 +98,12 @@ export function Navbar() {
               height={40}
               className="h-10 w-auto"
             />
-            <span className="font-bebas-neue text-2xl tracking-wider text-white">ROTASI</span>
+            <span className={cn(
+              "font-bebas-neue text-2xl tracking-wider transition-colors",
+              isHomePage 
+                ? (scrolled ? "text-foreground dark:text-foreground" : "text-white dark:text-foreground")
+                : "text-foreground dark:text-foreground"
+            )}>ROTASI</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -100,11 +112,19 @@ export function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-primary",
+                  isHomePage 
+                    ? (scrolled ? "text-foreground/80 dark:text-foreground/80" : "text-white/80 dark:text-foreground/80")
+                    : "text-foreground/80 dark:text-foreground/80"
+                )}
               >
                 {link.name}
               </Link>
             ))}
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
 
             {user ? (
               <div className="relative group">
@@ -152,7 +172,12 @@ export function Navbar() {
           </nav>
 
           {/* Mobile Menu Button */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+          <Button variant="ghost" size="icon" className={cn(
+            "md:hidden transition-colors",
+            isHomePage 
+              ? (scrolled ? "text-foreground dark:text-foreground" : "text-white dark:text-foreground")
+              : "text-foreground dark:text-foreground"
+          )} onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
@@ -172,6 +197,13 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
+            
+            {/* Theme Toggle for Mobile */}
+            <div className="border-t border-border/50 pt-2 mt-2">
+              <p className="text-xs font-semibold mb-2 text-foreground/60">Tema</p>
+              <ThemeToggle />
+            </div>
+            
             {user ? (
               <div className="border-t border-border/50 pt-2 mt-2">
                 <p className="text-xs font-semibold mb-1 text-foreground/60">User</p>

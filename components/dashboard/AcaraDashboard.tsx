@@ -50,6 +50,7 @@ interface TaskSubmission {
   participants: User
 }
 
+
 export function AcaraDashboard() {
   const { user: currentUser } = useAuth()
   const [sectors, setSectors] = useState<SectorData[]>([])
@@ -129,6 +130,7 @@ export function AcaraDashboard() {
       if (submissionsData.success) {
         setSubmissions(submissionsData.submissions)
       }
+
     } catch (error) {
       console.error('Error fetching data:', error)
       // Show user-friendly error message
@@ -194,6 +196,7 @@ export function AcaraDashboard() {
       toast({ title: 'Gagal', description: 'Gagal membuat tugas' })
     }
   }
+
 
   const handleEditTask = (task: Task) => {
     setSelectedTask(task)

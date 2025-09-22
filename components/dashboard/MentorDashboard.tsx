@@ -39,6 +39,7 @@ interface TaskSubmission {
   participants: User
 }
 
+
 export function MentorDashboard({ user }: { user: User }) {
   const [mentees, setMentees] = useState<Mentee[]>([])
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
@@ -78,6 +79,7 @@ export function MentorDashboard({ user }: { user: User }) {
       if (tasksData.success) {
         setTasks(tasksData.tasks)
       }
+
     } catch (error) {
       console.error('Error fetching data:', error)
     } finally {
@@ -218,7 +220,7 @@ export function MentorDashboard({ user }: { user: User }) {
                     const isOverdue = isTaskOverdue(task)
                     
                     return (
-                      <div key={task.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                      <div key={task.id} className="border rounded-lg p-4 bg-card">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
@@ -264,7 +266,7 @@ export function MentorDashboard({ user }: { user: User }) {
                             <span>Progress Submission</span>
                             <span>{submissionStatus.submitted}/{submissionStatus.total} mentee</span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                          <div className="w-full bg-muted rounded-full h-2">
                             <div 
                               className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
                               style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
@@ -297,7 +299,7 @@ export function MentorDashboard({ user }: { user: User }) {
                   const menteeSubmissions = getMenteeSubmissions(mentee.id)
                   
                   return (
-                    <div key={mentee.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                    <div key={mentee.id} className="border rounded-lg p-4 bg-card">
                       <div className="flex items-center justify-between mb-4">
                         <div>
                           <h3 className="font-semibold">{mentee.nama_lengkap}</h3>
@@ -310,7 +312,7 @@ export function MentorDashboard({ user }: { user: User }) {
                       <div className="space-y-2">
                         <h4 className="font-medium text-sm">Tugas Terkini:</h4>
                         {menteeSubmissions.slice(0, 3).map((submission) => (
-                          <div key={submission.id} className="flex items-center justify-between p-2 bg-gray-800 rounded">
+                          <div key={submission.id} className="flex items-center justify-between p-2 bg-muted rounded">
                             <div className="flex items-center gap-2">
                               <div>
                                 <p className="font-medium text-sm">{submission.tasks?.title ?? 'Tugas'}</p>
@@ -363,7 +365,7 @@ export function MentorDashboard({ user }: { user: User }) {
             <CardContent>
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                  <div key={submission.id} className="border rounded-lg p-4 bg-card">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
@@ -379,7 +381,7 @@ export function MentorDashboard({ user }: { user: User }) {
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-gray-800 p-3 rounded mb-3">
+                      <div className="bg-muted p-3 rounded mb-3">
                         <p className="text-sm">{submission.submission_text}</p>
                       </div>
                     )}
@@ -452,7 +454,7 @@ export function MentorDashboard({ user }: { user: User }) {
               {selectedSubmission.submission_text && (
                 <div>
                   <h4 className="font-medium">Submission Text</h4>
-                  <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded">
+                  <div className="bg-muted p-3 rounded">
                     <p className="text-sm">{selectedSubmission.submission_text}</p>
                   </div>
                 </div>
@@ -521,7 +523,7 @@ export function MentorDashboard({ user }: { user: User }) {
               
               <div>
                 <h4 className="font-medium">Deskripsi Tugas</h4>
-                <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded mt-2">
+                <div className="bg-muted p-3 rounded mt-2">
                   <p className="text-sm whitespace-pre-wrap">{selectedTask.description}</p>
                 </div>
               </div>
@@ -548,7 +550,7 @@ export function MentorDashboard({ user }: { user: User }) {
                         <span>Mentee yang sudah mengumpulkan</span>
                         <span>{submissionStatus.submitted}/{submissionStatus.total}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                      <div className="w-full bg-muted rounded-full h-2">
                         <div 
                           className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
                           style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
@@ -569,7 +571,7 @@ export function MentorDashboard({ user }: { user: User }) {
                   {submissions
                     .filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated'))
                     .map((submission) => (
-                      <div key={submission.id} className="flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                      <div key={submission.id} className="flex items-center justify-between p-2 bg-muted rounded">
                         <div>
                           <p className="text-sm font-medium">{submission.participants.nama_lengkap}</p>
                           <p className="text-xs text-muted-foreground">

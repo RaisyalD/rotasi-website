@@ -32,11 +32,11 @@ export default function Home() {
                 className="h-32 w-auto animate-fade-in"
               />
             </div>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 animate-fade-up">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 animate-fade-up text-white dark:text-white">
               REGENERASI DAN ORIENTASI MAHASISWA PSTI
             </h1>
             <p
-              className="text-xl md:text-2xl text-foreground/80 mb-8 animate-fade-up"
+              className="text-xl md:text-2xl text-white/80 dark:text-foreground/80 mb-8 animate-fade-up"
               style={{ animationDelay: "200ms" }}
             >
               Membentuk Karakter, Melanjutkan Perjuangan PSTI
@@ -256,10 +256,10 @@ export default function Home() {
               Jadilah bagian dari regenerasi PSTI UPI dan kembangkan potensimu bersama kami
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="default" className="bg-white text-maroon hover:bg-white/90">
+              <Button asChild size="lg" variant="default" className="bg-white text-maroon hover:bg-white/90 hover:text-maroon">
                 <Link href="https://www.instagram.com/rotasipsti/">Ikuti Instagram Kami</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white/10">
+              <Button asChild size="lg" variant="outline" className="text-black border-white hover:bg-white hover:text-black dark:text-white dark:hover:text-maroon">
                 <Link href="/auth/register-divisi">Gabung Sebagai Peserta</Link>
               </Button>
             </div>
