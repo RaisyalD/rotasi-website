@@ -78,10 +78,10 @@ export function AcaraRegisterForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <Calendar className="h-6 w-6" />
-              Daftar Admin ROTASI
+              Daftar Divisi Acara ROTASI
             </CardTitle>
             <CardDescription>
-              Lengkapi data untuk mendaftar sebagai admin
+              Lengkapi data untuk mendaftar sebagai divisi acara
             </CardDescription>
           </CardHeader>
           <CardContent>

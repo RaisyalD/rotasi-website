@@ -116,10 +116,10 @@ export function MentorRegisterForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <GraduationCap className="h-6 w-6" />
-              Daftar Panitia ROTASI
+              Daftar Divisi Mentor ROTASI
             </CardTitle>
             <CardDescription>
-              Lengkapi data untuk mendaftar sebagai panitia
+              Lengkapi data untuk mendaftar sebagai divisi mentor
             </CardDescription>
           </CardHeader>
           <CardContent>
