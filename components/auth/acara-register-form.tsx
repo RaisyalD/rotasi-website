@@ -120,13 +120,13 @@ export function AcaraRegisterForm() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="divisionPassword">Password Admin</Label>
+                  <Label htmlFor="divisionPassword">Password Divisi Acara</Label>
                   <Input
                     id="divisionPassword"
                     type="password"
                     value={formData.divisionPassword}
                     onChange={(e) => handleInputChange('divisionPassword', e.target.value)}
-                    placeholder="Masukkan password Admin"
+                    placeholder="Masukkan password Divisi Acara"
                     required
                   />
                 </div>

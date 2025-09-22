@@ -173,13 +173,13 @@ export function MentorRegisterForm() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="sectorPassword">Password Panitia</Label>
+                  <Label htmlFor="sectorPassword">Password Sektor</Label>
                   <Input
                     id="sectorPassword"
                     type="password"
                     value={formData.sectorPassword}
                     onChange={(e) => handleInputChange('sectorPassword', e.target.value)}
-                    placeholder="Masukkan password Panitia"
+                    placeholder="Masukkan password Sektor"
                     required
                   />
                 </div>

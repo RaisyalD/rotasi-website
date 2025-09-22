@@ -10,8 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/components/ui/use-toast"
+import { AuthGuard } from "@/components/auth/AuthGuard"
 
-export default function RegisterPesertaPage() {
+function RegisterPesertaForm() {
   const [loading, setLoading] = useState(false)
 
   const handleSubmitPeserta = (e: React.FormEvent) => {
@@ -132,5 +133,13 @@ export default function RegisterPesertaPage() {
         </div>
       </section>
     </>
+  )
+}
+
+export default function RegisterPesertaPage() {
+  return (
+    <AuthGuard>
+      <RegisterPesertaForm />
+    </AuthGuard>
   )
 } 
