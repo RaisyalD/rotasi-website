@@ -107,10 +107,10 @@ export function MentorLoginForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <GraduationCap className="h-6 w-6" />
-              Login Panitia ROTASI
+              Login Divisi Mentor ROTASI
             </CardTitle>
             <CardDescription>
-              Masukkan data untuk login sebagai panitia
+              Masukkan data untuk login sebagai divisi mentor
             </CardDescription>
           </CardHeader>
           <CardContent>

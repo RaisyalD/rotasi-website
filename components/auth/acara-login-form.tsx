@@ -69,10 +69,10 @@ export function AcaraLoginForm() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl flex items-center justify-center gap-2">
               <Calendar className="h-6 w-6" />
-              Login Admin ROTASI
+              Login Divisi Acara ROTASI
             </CardTitle>
             <CardDescription>
-              Masukkan data untuk login sebagai admin
+              Masukkan data untuk login sebagai divisi acara
             </CardDescription>
           </CardHeader>
           <CardContent>
