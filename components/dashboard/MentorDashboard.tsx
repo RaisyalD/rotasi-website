@@ -507,15 +507,15 @@ export function MentorDashboard({ user }: { user: User }) {
                 </div>
                 <div>
                   <h4 className="font-medium">Deadline</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(selectedTask.due_date).toLocaleDateString('id-ID')}
+                  <div className="text-sm text-muted-foreground flex items-center">
+                    <span>{new Date(selectedTask.due_date).toLocaleDateString('id-ID')}</span>
                     {isTaskOverdue(selectedTask) && (
                       <Badge variant="destructive" className="ml-2">
                         <Clock className="h-3 w-3 mr-1" />
                         Terlambat
                       </Badge>
                     )}
-                  </p>
+                  </div>
                 </div>
               </div>
               

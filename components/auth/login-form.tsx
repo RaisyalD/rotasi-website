@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/hooks/use-toast'
 
 interface Sector {
   sector_number: number
@@ -18,6 +19,7 @@ interface Sector {
 export function LoginForm() {
   const router = useRouter()
   const { login } = useAuth()
+  const { toast } = useToast()
   const [sectors, setSectors] = useState<Sector[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -88,7 +90,28 @@ export function LoginForm() {
 
       if (data.success) {
         login(data.user)
-        router.push('/dashboard')
+        
+        // Random motivational messages
+        const motivationalMessages = [
+          "Tetap semangat jalani harimu!",
+          "Jangan lupa makan dan minum ya untuk penuhi energimu!",
+          "Tetap senyum meskipun kamu lelah.",
+          "Jangan lupa untuk jaga kesehatan ya!"
+        ]
+        
+        const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)]
+        
+        // Show welcome notification
+        toast({
+          title: `Selamat datang ${data.user.nama_lengkap}!`,
+          description: randomMessage,
+          duration: 5000,
+        })
+        
+        // Redirect after showing notification
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 5000)
       } else {
         setError(data.error)
       }
