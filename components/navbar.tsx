@@ -17,6 +17,7 @@ const navLinks = [
   { name: "Struktur", href: "/struktur" },
   { name: "Tahapan", href: "/tahapan" },
   { name: "Galeri", href: "/galeri" },
+  { name: "Download", href: "/download" },
   { name: "Kontak", href: "/kontak" },
 ]
 
@@ -108,20 +109,27 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  isHomePage 
-                    ? (scrolled ? "text-foreground/80 dark:text-foreground/80" : "text-white/80 dark:text-foreground/80")
-                    : "text-foreground/80 dark:text-foreground/80"
-                )}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              // Hide download link on dashboard and auth pages
+              if (link.name === "Download" && isAuthOrDashboardPage) {
+                return null;
+              }
+              
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    isHomePage 
+                      ? (scrolled ? "text-foreground/80 dark:text-foreground/80" : "text-white/80 dark:text-foreground/80")
+                      : "text-foreground/80 dark:text-foreground/80"
+                  )}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
 
             {/* Theme Toggle */}
             <ThemeToggle />
@@ -187,16 +195,23 @@ export function Navbar() {
       {isOpen && (
         <nav className="md:hidden bg-background/95 backdrop-blur-sm border-t border-border/50 py-4 animate-fade-in">
           <div className="container mx-auto px-4 flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm font-medium py-2 text-foreground/80 hover:text-primary transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              // Hide download link on dashboard and auth pages
+              if (link.name === "Download" && isAuthOrDashboardPage) {
+                return null;
+              }
+              
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-medium py-2 text-foreground/80 hover:text-primary transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
             
             {/* Theme Toggle for Mobile */}
             <div className="border-t border-border/50 pt-2 mt-2">

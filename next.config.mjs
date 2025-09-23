@@ -8,6 +8,14 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'content.rotasipsti.id',
+        port: '',
+        pathname: '/images/**',
+      },
+    ],
   },
   async headers() {
     return [
