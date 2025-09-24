@@ -24,8 +24,8 @@ export default function DownloadPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg" asChild>
                 <a href="https://content.rotasipsti.id/app/peserta/MyROTASI.apk" download="MyROTASI.apk">
-                  <Download className="h-5 w-5 mr-2" />
-                  Download Sekarang
+                <Download className="h-5 w-5 mr-2" />
+                Download Sekarang
                 </a>
               </Button>
             </div>
@@ -156,10 +156,10 @@ export default function DownloadPage() {
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300">
               Temukan jawaban untuk pertanyaan umum tentang MyROTASI
-            </p>
-          </div>
+              </p>
+            </div>
 
-          <div className="space-y-6">
+            <div className="space-y-6">
             <Card className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader>
                 <CardTitle className="text-lg text-gray-900 dark:text-white">
