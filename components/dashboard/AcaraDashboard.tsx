@@ -86,7 +86,8 @@ export function AcaraDashboard() {
     description: '',
     due_date: ''
   })
-
+  const [isCreatingTask, setIsCreatingTask] = useState(false)
+  const [isDeletingTasks, setIsDeletingTasks] = useState(false)
 
   useEffect(() => {
     fetchAllData()
@@ -164,6 +165,8 @@ export function AcaraDashboard() {
       return
     }
 
+    setIsCreatingTask(true)
+
     try {
       // Create tasks for all sectors
       const createPromises = sectors.map(sector => 
@@ -200,6 +203,8 @@ export function AcaraDashboard() {
       console.error('Error creating task:', error)
       const { toast } = await import('@/hooks/use-toast')
       toast({ title: 'Gagal', description: 'Gagal membuat tugas' })
+    } finally {
+      setIsCreatingTask(false)
     }
   }
 
@@ -264,6 +269,8 @@ export function AcaraDashboard() {
     console.log('confirmBulkDelete called with bulkDeleteType:', bulkDeleteType)
     if (!bulkDeleteType) return
 
+    setIsDeletingTasks(true)
+
     try {
       let response
       if (bulkDeleteType === 'all') {
@@ -324,6 +331,8 @@ export function AcaraDashboard() {
       console.error('Error bulk deleting tasks:', error)
       const { toast } = await import('@/hooks/use-toast')
       toast({ title: 'Gagal', description: 'Gagal menghapus tugas' })
+    } finally {
+      setIsDeletingTasks(false)
     }
   }
 
@@ -715,9 +724,22 @@ export function AcaraDashboard() {
                   rows={3}
                 />
               </div>
-              <Button onClick={handleCreateTask} className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Buat Tugas
+              <Button 
+                onClick={handleCreateTask} 
+                className="w-full"
+                disabled={isCreatingTask}
+              >
+                {isCreatingTask ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Membuat Tugas...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Buat Tugas
+                  </>
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -1087,6 +1109,7 @@ export function AcaraDashboard() {
                 console.log('Cancel button clicked')
                 setBulkDeleteDialog(false)
               }}
+              disabled={isDeletingTasks}
               className="w-full sm:w-auto"
             >
               Batal
@@ -1097,14 +1120,25 @@ export function AcaraDashboard() {
                 console.log('Confirm delete button clicked')
                 confirmBulkDelete()
               }}
+              disabled={isDeletingTasks}
               className="w-full sm:w-auto"
             >
-              <span className="hidden sm:inline">
-                {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
-              </span>
-              <span className="sm:hidden">
-                {bulkDeleteType === 'all' ? 'Hapus Semua' : 'Hapus'}
-              </span>
+              {isDeletingTasks ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  <span className="hidden sm:inline">Menghapus...</span>
+                  <span className="sm:hidden">Menghapus...</span>
+                </>
+              ) : (
+                <>
+                  <span className="hidden sm:inline">
+                    {bulkDeleteType === 'all' ? 'Hapus Semua' : `Hapus ${selectedTaskIds.length} Tugas`}
+                  </span>
+                  <span className="sm:hidden">
+                    {bulkDeleteType === 'all' ? 'Hapus Semua' : 'Hapus'}
+                  </span>
+                </>
+              )}
             </Button>
           </div>
         </DialogContent>
