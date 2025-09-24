@@ -43,8 +43,14 @@ export default function DownloadPage() {
                     </div>
                     <div className="p-6 h-full bg-gradient-to-b from-red-50 to-white">
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-red-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
-                          <span className="text-white font-bold text-xl">MR</span>
+                        <div className="w-16 h-16 bg-black rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                          <Image
+                            src="https://content.rotasipsti.id/images/rotasi-logo.png"
+                            alt="ROTASI Logo"
+                            width={40}
+                            height={40}
+                            className="w-10 h-10"
+                          />
                         </div>
                         <h3 className="font-bold text-lg text-gray-900">MyRotasi</h3>
                         <p className="text-sm text-gray-600 mt-2">Akses ROTASI di genggaman Anda</p>
@@ -259,7 +265,7 @@ export default function DownloadPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Jika Anda mengalami masalah teknis atau memiliki pertanyaan tentang aplikasi, silakan hubungi tim support ROTASI melalui email hi@web.rotasipsti.id
+                  Jika Anda mengalami masalah teknis atau memiliki pertanyaan tentang aplikasi, silakan hubungi tim website ROTASI melalui email hi@web.rotasipsti.id
                 </p>
               </CardContent>
             </Card>
