@@ -44,9 +44,9 @@ export function ModernThemeToggle({
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("theme-toggle-container flex items-center gap-1.5 sm:gap-2", className)}>
       <Sun className={cn(
-        "h-4 w-4 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+        "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
         "hover:scale-110 active:scale-95",
         getIconColor(!isDark)
       )} />
@@ -61,7 +61,7 @@ export function ModernThemeToggle({
         )}
       />
       <Moon className={cn(
-        "h-4 w-4 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+        "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
         "hover:scale-110 active:scale-95",
         getIconColor(isDark)
       )} />

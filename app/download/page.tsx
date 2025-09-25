@@ -200,7 +200,7 @@ export default function DownloadPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Tidak, MyROTASI adalah aplikasi 100% tanpa iklan. Kami berkomitmen memberikan pengalaman yang terbaik untuk peserta ROTASI.
+                  Tidak, aplikasi MyROTASI 100% tanpa iklan. Kami berkomitmen memberikan pengalaman yang terbaik untuk peserta ROTASI.
                 </p>
               </CardContent>
             </Card>
@@ -252,7 +252,7 @@ export default function DownloadPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Saat ini MyROTASI hanya tersedia untuk perangkat Android. Untuk pengguna iOS, Anda dapat mengakses ROTASI melalui website resmi di browser Safari atau browser lainnya.
+                  Saat ini MyROTASI hanya tersedia untuk perangkat Android. Untuk pengguna iOS, Anda dapat mengakses ROTASI di browser Safari atau browser lainnya.
                 </p>
               </CardContent>
             </Card>

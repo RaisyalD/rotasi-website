@@ -193,7 +193,7 @@ export function PesertaDashboard({ user }: { user: User }) {
           
           xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
-              const percentComplete = Math.round((event.loaded / event.total) * 50) // File upload is 50% of total progress
+              const percentComplete = Math.round((event.loaded / event.total) * 80) // File upload is 80% of total progress
               setUploadProgress(percentComplete)
             }
           })
@@ -203,7 +203,7 @@ export function PesertaDashboard({ user }: { user: User }) {
               try {
                 const response = JSON.parse(xhr.responseText)
                 if (response.success) {
-                  setUploadProgress(50) // File upload complete
+                  setUploadProgress(80) // File upload complete
                   resolve({
                     fileUrl: response.fileUrl,
                     fileName: response.fileName
@@ -234,12 +234,15 @@ export function PesertaDashboard({ user }: { user: User }) {
         // Keep existing file if no new file uploaded
         fileUrl = editingSubmission.file_url || ''
         fileName = editingSubmission.file_name || ''
-        setUploadProgress(50) // Skip file upload progress
+        setUploadProgress(80) // Skip file upload progress
       }
 
       // Create or update submission
       const isEditing = editingSubmission !== null
-      setUploadProgress(75) // Database operation in progress
+      
+      // Small delay to show smooth transition
+      await new Promise(resolve => setTimeout(resolve, 200))
+      setUploadProgress(90) // Database operation in progress
       
       const submissionResponse = await fetch('/api/submissions' + (isEditing ? `/${editingSubmission.id}` : ''), {
         method: isEditing ? 'PUT' : 'POST',
@@ -258,6 +261,8 @@ export function PesertaDashboard({ user }: { user: User }) {
       const submissionData = await submissionResponse.json()
 
       if (submissionData.success) {
+        // Small delay before showing completion
+        await new Promise(resolve => setTimeout(resolve, 300))
         setUploadProgress(100) // Complete
         const { toast } = await import('@/hooks/use-toast')
         toast({ 
@@ -675,11 +680,9 @@ export function PesertaDashboard({ user }: { user: User }) {
                   <span className="text-sm font-medium">Progress Upload</span>
                   <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
                 </div>
-                <Progress value={uploadProgress} className="w-full" />
+                <Progress value={uploadProgress} className="w-full transition-all duration-300 ease-out" />
                 <p className="text-xs text-muted-foreground">
-                  {uploadProgress < 50 ? 'Mengupload file...' : 
-                   uploadProgress < 75 ? 'File berhasil diupload' :
-                   uploadProgress < 100 ? 'Menyimpan data...' : 'Selesai!'}
+                  {uploadProgress < 100 ? 'Mengupload tugas...' : 'Upload selesai!'}
                 </p>
               </div>
             )}

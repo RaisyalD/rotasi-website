@@ -18,6 +18,23 @@
     min-width: 44px;
   }
   
+  /* Exclude theme toggle switch from minimum size requirements */
+  button[role="switch"], [role="switch"] {
+    min-height: auto;
+    min-width: auto;
+  }
+  
+  /* Ensure theme toggle components maintain proper sizing */
+  .theme-toggle-container {
+    min-height: auto;
+    min-width: auto;
+  }
+  
+  .theme-toggle-container * {
+    min-height: auto;
+    min-width: auto;
+  }
+  
   /* Prevent text selection issues */
   * {
     -webkit-user-select: none;
