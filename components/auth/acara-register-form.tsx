@@ -56,11 +56,10 @@ export function AcaraRegisterForm() {
       const data = await response.json()
 
       if (data.success) {
-        setSuccess('Registrasi berhasil!')
-        login(data.user)
+        setSuccess('Registrasi berhasil! Silakan login untuk melanjutkan.')
         setTimeout(() => {
-          router.push('/dashboard')
-        }, 1500)
+          router.push('/auth/login-acara')
+        }, 2000)
       } else {
         setError(data.error)
       }
