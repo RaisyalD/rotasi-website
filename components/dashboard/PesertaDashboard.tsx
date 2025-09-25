@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
-import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle, Edit, FileIcon, X } from 'lucide-react'
+import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle, Edit, FileIcon, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -58,6 +58,9 @@ export function PesertaDashboard({ user }: { user: User }) {
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isDragOver, setIsDragOver] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  
+  // Expandable description states
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchData()
@@ -315,6 +318,34 @@ export function PesertaDashboard({ user }: { user: User }) {
     }
   }
 
+  const toggleDescription = (taskId: string) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId)
+      } else {
+        newSet.add(taskId)
+      }
+      return newSet
+    })
+  }
+
+  const formatDateTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      const dateStr = date.toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })
+      const timeStr = date.toLocaleTimeString('id-ID', { 
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      })
+      return `${dateStr} ${timeStr}`
+    } catch {
+      return dateString
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -411,13 +442,39 @@ export function PesertaDashboard({ user }: { user: User }) {
                         </div>
                       </div>
                       
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {task.description}
-                      </p>
+                      <div className="mb-3">
+                        {task.description.length > 100 ? (
+                          <div>
+                            <p className={`text-sm text-muted-foreground whitespace-pre-wrap break-words break-all ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
+                              {task.description}
+                            </p>
+                            <button
+                              onClick={() => toggleDescription(task.id)}
+                              className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                            >
+                              {expandedDescriptions.has(task.id) ? (
+                                <>
+                                  <ChevronUp className="h-3 w-3" />
+                                  Tampilkan Lebih Sedikit
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="h-3 w-3" />
+                                  Tampilkan Lebih Banyak
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all">
+                            {task.description}
+                          </p>
+                        )}
+                      </div>
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}</span>
+                          <span>Deadline: {formatDateTime(task.due_date)}</span>
                           {(() => {
                             const now = new Date()
                             const deadline = new Date(task.due_date)

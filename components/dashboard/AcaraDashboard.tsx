@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download, RefreshCw, DownloadCloud, Archive } from 'lucide-react'
+import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download, RefreshCw, DownloadCloud, Archive, Clock, ChevronDown, ChevronUp } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -71,6 +71,7 @@ export function AcaraDashboard() {
     title: '',
     description: '',
     due_date: '',
+    due_time: '23:59',
     status: 'active' as 'active' | 'completed' | 'cancelled'
   })
 
@@ -84,10 +85,18 @@ export function AcaraDashboard() {
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    due_date: ''
+    due_date: '',
+    due_time: '23:59'
   })
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const [isDeletingTasks, setIsDeletingTasks] = useState(false)
+  
+  // Time picker states
+  const [timePickerOpen, setTimePickerOpen] = useState(false)
+  const [timePickerType, setTimePickerType] = useState<'create' | 'edit' | 'bulk-edit'>('create')
+  
+  // Expandable description states
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchAllData()
@@ -153,7 +162,7 @@ export function AcaraDashboard() {
   }
 
   const handleCreateTask = async () => {
-    if (!newTask.title || !newTask.description || !newTask.due_date) {
+    if (!newTask.title || !newTask.description || !newTask.due_date || !newTask.due_time) {
       const { toast } = await import('@/hooks/use-toast')
       toast({ title: 'Lengkapi data', description: 'Harap isi semua field' })
       return
@@ -179,7 +188,7 @@ export function AcaraDashboard() {
             title: newTask.title,
             description: newTask.description,
             sector: sector.sector_number,
-            due_date: newTask.due_date,
+            due_date: `${newTask.due_date}T${newTask.due_time}:00+07:00`,
             userId: currentUser.id
           })
         })
@@ -193,7 +202,7 @@ export function AcaraDashboard() {
       if (successCount > 0) {
         const { toast } = await import('@/hooks/use-toast')
         toast({ title: 'Berhasil', description: `Tugas berhasil dibuat untuk ${successCount} sektor` })
-        setNewTask({ title: '', description: '', due_date: '' })
+        setNewTask({ title: '', description: '', due_date: '', due_time: '23:59' })
         fetchAllData()
       } else {
         const { toast } = await import('@/hooks/use-toast')
@@ -211,10 +220,19 @@ export function AcaraDashboard() {
 
   const handleEditTask = (task: Task) => {
     setSelectedTask(task)
+    const taskDate = new Date(task.due_date)
+    const dateStr = taskDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' }) // YYYY-MM-DD format
+    const timeStr = taskDate.toLocaleTimeString('en-US', { 
+      timeZone: 'Asia/Jakarta',
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    })
     setNewTask({
       title: task.title,
       description: task.description,
-      due_date: task.due_date
+      due_date: dateStr,
+      due_time: timeStr
     })
     setEditTaskDialog(true)
   }
@@ -231,7 +249,7 @@ export function AcaraDashboard() {
         body: JSON.stringify({
           title: newTask.title,
           description: newTask.description,
-          due_date: newTask.due_date
+          due_date: `${newTask.due_date}T${newTask.due_time}:00+07:00`
         })
       })
 
@@ -366,6 +384,7 @@ export function AcaraDashboard() {
       title: '',
       description: '',
       due_date: '',
+      due_time: '23:59',
       status: 'active'
     })
     setBulkEditDialog(true)
@@ -402,7 +421,10 @@ export function AcaraDashboard() {
         },
         body: JSON.stringify({
           taskIds: bulkEditTaskIds,
-          updateData: bulkEditData
+          updateData: {
+            ...bulkEditData,
+            due_date: bulkEditData.due_date ? `${bulkEditData.due_date}T${bulkEditData.due_time}:00+07:00` : bulkEditData.due_date
+          }
         })
       })
 
@@ -420,6 +442,7 @@ export function AcaraDashboard() {
           title: '',
           description: '',
           due_date: '',
+          due_time: '23:59',
           status: 'active'
         })
         fetchAllData()
@@ -586,6 +609,38 @@ export function AcaraDashboard() {
     }
   }
 
+  const openTimePicker = (type: 'create' | 'edit' | 'bulk-edit') => {
+    setTimePickerType(type)
+    setTimePickerOpen(true)
+  }
+
+  const handleTimeSelect = (time: string) => {
+    if (timePickerType === 'create') {
+      setNewTask({...newTask, due_time: time})
+    } else if (timePickerType === 'edit') {
+      setNewTask({...newTask, due_time: time})
+    } else if (timePickerType === 'bulk-edit') {
+      setBulkEditData({...bulkEditData, due_time: time})
+    }
+    // Don't close dialog automatically
+  }
+
+  const handleTimePickerConfirm = () => {
+    setTimePickerOpen(false)
+  }
+
+  const toggleDescription = (taskId: string) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId)
+      } else {
+        newSet.add(taskId)
+      }
+      return newSet
+    })
+  }
+
 
   const getSectorSubmissions = (sectorNumber: number) => {
     return submissions.filter(sub => sub.sector === sectorNumber)
@@ -595,10 +650,25 @@ export function AcaraDashboard() {
     try {
       const submitted = new Date(submittedAt)
       const deadline = new Date(task.due_date)
-      deadline.setHours(23, 59, 59, 999)
       return submitted.getTime() > deadline.getTime()
     } catch {
       return false
+    }
+  }
+
+  const formatDateTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      const dateStr = date.toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })
+      const timeStr = date.toLocaleTimeString('id-ID', { 
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      })
+      return `${dateStr} ${timeStr}`
+    } catch {
+      return dateString
     }
   }
 
@@ -704,14 +774,33 @@ export function AcaraDashboard() {
                     placeholder="Masukkan judul tugas"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="task-due-date">Deadline</Label>
-                  <Input
-                    id="task-due-date"
-                    type="date"
-                    value={newTask.due_date}
-                    onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label htmlFor="task-due-date">Deadline Tanggal</Label>
+                    <Input
+                      id="task-due-date"
+                      type="date"
+                      value={newTask.due_date}
+                      onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="task-due-time">Deadline Jam</Label>
+                    <div className="relative">
+                      <Input
+                        id="task-due-time"
+                        type="time"
+                        value={newTask.due_time || '23:59'}
+                        onChange={(e) => setNewTask({...newTask, due_time: e.target.value})}
+                        step="60"
+                        className="pr-10"
+                      />
+                      <Clock 
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" 
+                        onClick={() => openTimePicker('create')}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               <div>
@@ -810,10 +899,38 @@ export function AcaraDashboard() {
                           <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
                             <div className="flex-1">
                               <h3 className="font-semibold">{task.title}</h3>
-                              <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all">{task.description}</p>
+                              <div className="mt-2">
+                                {task.description.length > 100 ? (
+                                  <div>
+                                    <p className={`text-sm text-muted-foreground whitespace-pre-wrap break-words break-all ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
+                                      {task.description}
+                                    </p>
+                                    <button
+                                      onClick={() => toggleDescription(task.id)}
+                                      className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                                    >
+                                      {expandedDescriptions.has(task.id) ? (
+                                        <>
+                                          <ChevronUp className="h-3 w-3" />
+                                          Tampilkan Lebih Sedikit
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown className="h-3 w-3" />
+                                          Tampilkan Lebih Banyak
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all">
+                                    {task.description}
+                                  </p>
+                                )}
+                              </div>
                               <div className="flex items-center gap-4 mt-2">
                                 <Badge variant="outline">Sektor {task.sector}</Badge>
-                                <Badge variant="secondary">Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}</Badge>
+                                <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
                                 <Badge variant={task.status === 'active' ? 'default' : 'secondary'}>
                                   {task.status === 'active' ? 'Aktif' : 'Selesai'}
                                 </Badge>
@@ -878,13 +995,42 @@ export function AcaraDashboard() {
                       ) : (
                         <div className="space-y-3">
                           {sectorSubs.map((submission) => (
-                            <div key={submission.id} className="border rounded-lg p-4 bg-gray-900/20 dark:bg-gray-800">
+                            <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                               <div className="flex items-center justify-between mb-3">
                                 <div>
                                   <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
                                   <p className="text-sm text-muted-foreground">
                                     {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
                                   </p>
+                                  <div className="mt-1">
+                                    {submission.tasks.description.length > 100 ? (
+                                      <div>
+                                        <p className={`text-sm text-gray-600 dark:text-gray-400 ${!expandedDescriptions.has(submission.tasks.id) ? 'line-clamp-2' : ''}`}>
+                                          {submission.tasks.description}
+                                        </p>
+                                        <button
+                                          onClick={() => toggleDescription(submission.tasks.id)}
+                                          className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                                        >
+                                          {expandedDescriptions.has(submission.tasks.id) ? (
+                                            <>
+                                              <ChevronUp className="h-3 w-3" />
+                                              Tampilkan Lebih Sedikit
+                                            </>
+                                          ) : (
+                                            <>
+                                              <ChevronDown className="h-3 w-3" />
+                                              Tampilkan Lebih Banyak
+                                            </>
+                                          )}
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                                        {submission.tasks.description}
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {isSubmissionLate(submission.tasks, submission.submitted_at) && (
@@ -902,8 +1048,8 @@ export function AcaraDashboard() {
                                 </div>
                               )}
                               {submission.submission_text && (
-                                <div className="bg-gray-800 p-3 rounded mb-3">
-                                  <p className="text-sm">{submission.submission_text}</p>
+                                <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded mb-3">
+                                  <p className="text-sm text-gray-700 dark:text-gray-300">{submission.submission_text}</p>
                                 </div>
                               )}
                             </div>
@@ -980,14 +1126,33 @@ export function AcaraDashboard() {
                 rows={3}
               />
             </div>
-            <div>
-              <Label htmlFor="edit-task-due-date">Deadline</Label>
-              <Input
-                id="edit-task-due-date"
-                type="date"
-                value={newTask.due_date}
-                onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label htmlFor="edit-task-due-date">Deadline Tanggal</Label>
+                <Input
+                  id="edit-task-due-date"
+                  type="date"
+                  value={newTask.due_date}
+                  onChange={(e) => setNewTask({...newTask, due_date: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-task-due-time">Deadline Jam</Label>
+                <div className="relative">
+                  <Input
+                    id="edit-task-due-time"
+                    type="time"
+                    value={newTask.due_time || '23:59'}
+                    onChange={(e) => setNewTask({...newTask, due_time: e.target.value})}
+                    step="60"
+                    className="pr-10"
+                  />
+                  <Clock 
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" 
+                    onClick={() => openTimePicker('edit')}
+                  />
+                </div>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
               <Button 
@@ -1049,7 +1214,7 @@ export function AcaraDashboard() {
                     <label htmlFor={`task-${task.id}`} className="block cursor-pointer">
                       <div className="font-medium text-sm">{task.title}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        Sektor {task.sector} • Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
+                        Sektor {task.sector} • Deadline: {formatDateTime(task.due_date)}
                       </div>
                       <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                         {task.description}
@@ -1227,7 +1392,7 @@ export function AcaraDashboard() {
                       <label htmlFor={`download-task-${task.id}`} className="block cursor-pointer">
                         <div className="font-medium text-sm">{task.title}</div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Sektor {task.sector} • {taskSubmissions.length} file submission
+                          Sektor {task.sector} • Deadline: {formatDateTime(task.due_date)} • {taskSubmissions.length} file submission
                         </div>
                         <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                           {task.description}
@@ -1318,7 +1483,7 @@ export function AcaraDashboard() {
                       <label htmlFor={`bulk-edit-task-${task.id}`} className="block cursor-pointer">
                         <div className="font-medium text-sm">{task.title}</div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Sektor {task.sector} • Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
+                          Sektor {task.sector} • Deadline: {formatDateTime(task.due_date)}
                         </div>
                         <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                           {task.description}
@@ -1344,14 +1509,33 @@ export function AcaraDashboard() {
                     placeholder="Masukkan judul tugas baru"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="bulk-edit-due-date">Deadline</Label>
-                  <Input
-                    id="bulk-edit-due-date"
-                    type="date"
-                    value={bulkEditData.due_date}
-                    onChange={(e) => setBulkEditData({...bulkEditData, due_date: e.target.value})}
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label htmlFor="bulk-edit-due-date">Deadline Tanggal</Label>
+                    <Input
+                      id="bulk-edit-due-date"
+                      type="date"
+                      value={bulkEditData.due_date}
+                      onChange={(e) => setBulkEditData({...bulkEditData, due_date: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="bulk-edit-due-time">Deadline Jam</Label>
+                    <div className="relative">
+                      <Input
+                        id="bulk-edit-due-time"
+                        type="time"
+                        value={bulkEditData.due_time || '23:59'}
+                        onChange={(e) => setBulkEditData({...bulkEditData, due_time: e.target.value})}
+                        step="60"
+                        className="pr-10"
+                      />
+                      <Clock 
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" 
+                        onClick={() => openTimePicker('bulk-edit')}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
               
@@ -1408,6 +1592,104 @@ export function AcaraDashboard() {
                 <span className="sm:hidden">Update {bulkEditTaskIds.length}</span>
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Time Picker Dialog */}
+      <Dialog open={timePickerOpen} onOpenChange={setTimePickerOpen}>
+        <DialogContent className="max-w-sm max-h-[80vh] overflow-y-auto mx-4">
+          <DialogHeader>
+            <DialogTitle>Pilih Waktu Deadline</DialogTitle>
+            <DialogDescription>
+              Pilih jam dan menit untuk deadline tugas
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 pb-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="time-picker-hour">Jam</Label>
+                <Select
+                  value={(() => {
+                    const currentTime = timePickerType === 'create' ? newTask.due_time : 
+                                      timePickerType === 'edit' ? newTask.due_time : 
+                                      bulkEditData.due_time
+                    return currentTime ? currentTime.split(':')[0] : '23'
+                  })()}
+                  onValueChange={(hour) => {
+                    const currentTime = timePickerType === 'create' ? newTask.due_time : 
+                                      timePickerType === 'edit' ? newTask.due_time : 
+                                      bulkEditData.due_time
+                    const minute = currentTime ? currentTime.split(':')[1] : '59'
+                    const newTime = `${hour.padStart(2, '0')}:${minute}`
+                    handleTimeSelect(newTime)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {Array.from({ length: 24 }, (_, i) => (
+                      <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                        {i.toString().padStart(2, '0')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="time-picker-minute">Menit</Label>
+                <Select
+                  value={(() => {
+                    const currentTime = timePickerType === 'create' ? newTask.due_time : 
+                                      timePickerType === 'edit' ? newTask.due_time : 
+                                      bulkEditData.due_time
+                    return currentTime ? currentTime.split(':')[1] : '59'
+                  })()}
+                  onValueChange={(minute) => {
+                    const currentTime = timePickerType === 'create' ? newTask.due_time : 
+                                      timePickerType === 'edit' ? newTask.due_time : 
+                                      bulkEditData.due_time
+                    const hour = currentTime ? currentTime.split(':')[0] : '23'
+                    const newTime = `${hour}:${minute.padStart(2, '0')}`
+                    handleTimeSelect(newTime)
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[200px]">
+                    {Array.from({ length: 60 }, (_, i) => (
+                      <SelectItem key={i} value={i.toString().padStart(2, '0')}>
+                        {i.toString().padStart(2, '0')}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="text-lg font-mono bg-muted px-4 py-2 rounded">
+                {(() => {
+                  const currentTime = timePickerType === 'create' ? newTask.due_time : 
+                                    timePickerType === 'edit' ? newTask.due_time : 
+                                    bulkEditData.due_time
+                  return currentTime || '23:59'
+                })()}
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 pt-4 pb-2">
+            <Button variant="outline" onClick={() => setTimePickerOpen(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleTimePickerConfirm}>
+              Pilih
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

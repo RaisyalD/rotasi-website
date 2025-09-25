@@ -41,7 +41,7 @@ CREATE TABLE tasks (
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     sector INTEGER NOT NULL,
-    due_date DATE NOT NULL,
+    due_date TIMESTAMP WITH TIME ZONE NOT NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled')),
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

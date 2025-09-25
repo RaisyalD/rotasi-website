@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Allow 12-hour format for time inputs */
+input[type="time"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 /* WebView compatibility styles */
 .webview-environment {
   /* Ensure proper scrolling in webview */

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Users, GraduationCap, Eye, FileText, Download, AlertTriangle, Calendar, Clock, DownloadCloud, Archive, RefreshCw } from 'lucide-react'
+import { Users, GraduationCap, Eye, FileText, Download, AlertTriangle, Calendar, Clock, DownloadCloud, Archive, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 
@@ -55,6 +55,9 @@ export function MentorDashboard({ user }: { user: User }) {
   const [downloadTaskSelectionDialog, setDownloadTaskSelectionDialog] = useState(false)
   const [selectedDownloadTaskIds, setSelectedDownloadTaskIds] = useState<string[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
+  
+  // Expandable description states
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     fetchMentees()
@@ -93,7 +96,33 @@ export function MentorDashboard({ user }: { user: User }) {
     }
   }
 
+  const toggleDescription = (taskId: string) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId)
+      } else {
+        newSet.add(taskId)
+      }
+      return newSet
+    })
+  }
 
+  const formatDateTime = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      const dateStr = date.toLocaleDateString('id-ID', { timeZone: 'Asia/Jakarta' })
+      const timeStr = date.toLocaleTimeString('id-ID', { 
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      })
+      return `${dateStr} ${timeStr}`
+    } catch {
+      return dateString
+    }
+  }
 
   const isSubmissionLate = (task: Task, submittedAt: string) => {
     try {
@@ -391,13 +420,39 @@ export function MentorDashboard({ user }: { user: User }) {
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-muted-foreground mb-3 whitespace-pre-wrap">
-                              {task.description}
-                            </p>
+                            <div className="mb-3">
+                              {task.description.length > 100 ? (
+                                <div>
+                                  <p className={`text-sm text-muted-foreground whitespace-pre-wrap ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
+                                    {task.description}
+                                  </p>
+                                  <button
+                                    onClick={() => toggleDescription(task.id)}
+                                    className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                                  >
+                                    {expandedDescriptions.has(task.id) ? (
+                                      <>
+                                        <ChevronUp className="h-3 w-3" />
+                                        Tampilkan Lebih Sedikit
+                                      </>
+                                    ) : (
+                                      <>
+                                        <ChevronDown className="h-3 w-3" />
+                                        Tampilkan Lebih Banyak
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                  {task.description}
+                                </p>
+                              )}
+                            </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
-                                Deadline: {new Date(task.due_date).toLocaleDateString('id-ID')}
+                                Deadline: {formatDateTime(task.due_date)}
                               </span>
                               <span className="flex items-center gap-1">
                                 <Users className="h-4 w-4" />
@@ -831,8 +886,34 @@ export function MentorDashboard({ user }: { user: User }) {
                         <div className="text-xs text-gray-500 mt-1">
                           Sektor {task.sector} • {taskSubmissions.length} file submission
                         </div>
-                        <div className="text-xs text-gray-600 mt-1 line-clamp-2">
-                          {task.description}
+                        <div className="text-xs text-gray-600 mt-1">
+                          {task.description.length > 100 ? (
+                            <div>
+                              <p className={`${!expandedDescriptions.has(task.id) ? 'line-clamp-2' : ''}`}>
+                                {task.description}
+                              </p>
+                              <button
+                                onClick={() => toggleDescription(task.id)}
+                                className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                              >
+                                {expandedDescriptions.has(task.id) ? (
+                                  <>
+                                    <ChevronUp className="h-3 w-3" />
+                                    Tampilkan Lebih Sedikit
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown className="h-3 w-3" />
+                                    Tampilkan Lebih Banyak
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <p className="line-clamp-2">
+                              {task.description}
+                            </p>
+                          )}
                         </div>
                       </label>
                     </div>
