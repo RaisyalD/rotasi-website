@@ -230,9 +230,7 @@ export function Navbar() {
             {/* Theme Toggle for Mobile */}
             <div className="border-t border-border/50 pt-2 mt-2">
               <p className="text-xs font-semibold mb-2 text-foreground/60">Tema</p>
-              <div className="flex justify-center">
-                <ModernThemeToggle />
-              </div>
+              <ModernThemeToggle />
             </div>
             
             {user ? (
