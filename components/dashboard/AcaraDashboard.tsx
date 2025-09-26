@@ -103,6 +103,10 @@ export function AcaraDashboard() {
 
   // Helper function to get unique tasks (one per title)
   const getUniqueTasks = () => {
+    if (!tasks || tasks.length === 0) {
+      return []
+    }
+    
     const uniqueTasks: Task[] = []
     const seenTitles = new Set<string>()
     
@@ -123,46 +127,77 @@ export function AcaraDashboard() {
   const fetchAllData = async () => {
     try {
       // Fetch sectors data
-      const sectorsResponse = await safeFetch('/api/sectors')
-      const sectorsData = await sectorsResponse.json()
-      
-      if (sectorsData.success) {
-        const sectorsWithData = await Promise.all(
-          sectorsData.sectors.map(async (sector: any) => {
-            const [participantsRes, mentorsRes] = await Promise.all([
-              safeFetch(`/api/users?role=peserta&sektor=${sector.sector_number}`),
-              safeFetch(`/api/users?role=mentor&sektor=${sector.sector_number}`)
-            ])
-            
-            const participantsData = await participantsRes.json()
-            const mentorsData = await mentorsRes.json()
-            
-            return {
-              sector_number: sector.sector_number,
-              sector_name: sector.sector_name,
-              participants: participantsData.success ? participantsData.users : [],
-              mentors: mentorsData.success ? mentorsData.users : []
-            }
-          })
-        )
+      try {
+        const sectorsResponse = await safeFetch('/api/sectors')
+        const sectorsData = await sectorsResponse.json()
         
-        setSectors(sectorsWithData)
+        if (sectorsData.success) {
+          const sectorsWithData = await Promise.all(
+            sectorsData.sectors.map(async (sector: any) => {
+              try {
+                const [participantsRes, mentorsRes] = await Promise.all([
+                  safeFetch(`/api/users?role=peserta&sektor=${sector.sector_number}`),
+                  safeFetch(`/api/users?role=mentor&sektor=${sector.sector_number}`)
+                ])
+                
+                const participantsData = await participantsRes.json()
+                const mentorsData = await mentorsRes.json()
+                
+                return {
+                  sector_number: sector.sector_number,
+                  sector_name: sector.sector_name,
+                  participants: participantsData.success ? participantsData.users : [],
+                  mentors: mentorsData.success ? mentorsData.users : []
+                }
+              } catch (error) {
+                console.error(`Error fetching data for sector ${sector.sector_number}:`, error)
+                return {
+                  sector_number: sector.sector_number,
+                  sector_name: sector.sector_name,
+                  participants: [],
+                  mentors: []
+                }
+              }
+            })
+          )
+          
+          setSectors(sectorsWithData)
+        }
+      } catch (error) {
+        console.error('Error fetching sectors data:', error)
+        setSectors([])
       }
 
       // Fetch tasks
-      const tasksResponse = await safeFetch('/api/tasks')
-      const tasksData = await tasksResponse.json()
-      
-      if (tasksData.success) {
-        setTasks(tasksData.tasks)
+      try {
+        const tasksResponse = await safeFetch('/api/tasks')
+        const tasksData = await tasksResponse.json()
+        
+        if (tasksData.success) {
+          setTasks(tasksData.tasks)
+        } else {
+          console.error('Failed to fetch tasks:', tasksData)
+          setTasks([])
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error)
+        setTasks([])
       }
 
       // Fetch submissions
-      const submissionsResponse = await safeFetch('/api/submissions')
-      const submissionsData = await submissionsResponse.json()
-      
-      if (submissionsData.success) {
-        setSubmissions(submissionsData.submissions)
+      try {
+        const submissionsResponse = await safeFetch('/api/submissions')
+        const submissionsData = await submissionsResponse.json()
+        
+        if (submissionsData.success) {
+          setSubmissions(submissionsData.submissions)
+        } else {
+          console.error('Failed to fetch submissions:', submissionsData)
+          setSubmissions([])
+        }
+      } catch (error) {
+        console.error('Error fetching submissions:', error)
+        setSubmissions([])
       }
 
     } catch (error) {

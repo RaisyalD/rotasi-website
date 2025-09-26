@@ -74,20 +74,60 @@ export function MentorDashboard({ user }: { user: User }) {
         setMentees(data.users)
       }
 
-      // Fetch submissions for the sector
-      const submissionsResponse = await fetch(`/api/submissions?sector=${user.sektor}`)
-      const submissionsData = await submissionsResponse.json()
-      
-      if (submissionsData.success) {
-        setSubmissions(submissionsData.submissions)
-      }
-
-      // Fetch tasks for the sector
+      // Fetch tasks for the sector first
       const tasksResponse = await fetch(`/api/tasks?sector=${user.sektor}`)
       const tasksData = await tasksResponse.json()
       
       if (tasksData.success) {
         setTasks(tasksData.tasks)
+        
+        // Check if there are any "angkatan" tasks
+        const hasAngkatanTasks = tasksData.tasks.some((task: any) => task.task_type === 'angkatan')
+        
+        if (hasAngkatanTasks) {
+          // If there are angkatan tasks, fetch ALL submissions
+          const allSubmissionsResponse = await fetch('/api/submissions')
+          const allSubmissionsData = await allSubmissionsResponse.json()
+          
+          if (allSubmissionsData.success) {
+            // For angkatan tasks, we need submissions from ALL sectors
+            // For other tasks, we only need submissions from current sector
+            const angkatanTaskIds = tasksData.tasks
+              .filter((task: any) => task.task_type === 'angkatan')
+              .map((task: any) => task.id)
+            
+            const nonAngkatanTaskIds = tasksData.tasks
+              .filter((task: any) => task.task_type !== 'angkatan')
+              .map((task: any) => task.id)
+            
+            // Get all submissions for angkatan tasks (from all sectors)
+            const angkatanSubmissions = allSubmissionsData.submissions.filter((sub: any) => 
+              angkatanTaskIds.includes(sub.task_id)
+            )
+            
+            // Get sector submissions for non-angkatan tasks
+            const sectorSubmissionsResponse = await fetch(`/api/submissions?sector=${user.sektor}`)
+            const sectorSubmissionsData = await sectorSubmissionsResponse.json()
+            
+            const nonAngkatanSubmissions = sectorSubmissionsData.success 
+              ? sectorSubmissionsData.submissions.filter((sub: any) => 
+                  nonAngkatanTaskIds.includes(sub.task_id)
+                )
+              : []
+            
+            // Combine both types of submissions
+            const combinedSubmissions = [...angkatanSubmissions, ...nonAngkatanSubmissions]
+            setSubmissions(combinedSubmissions)
+          }
+        } else {
+          // If no angkatan tasks, fetch only sector submissions
+          const submissionsResponse = await fetch(`/api/submissions?sector=${user.sektor}`)
+          const submissionsData = await submissionsResponse.json()
+          
+          if (submissionsData.success) {
+            setSubmissions(submissionsData.submissions)
+          }
+        }
       }
 
     } catch (error) {
@@ -532,26 +572,26 @@ export function MentorDashboard({ user }: { user: User }) {
                           </div>
                         </div>
                         
-                        {/* Progress Bar */}
-                        <div className="space-y-2">
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 text-sm">
-                            <span>Progress Submission</span>
-                            <span className="text-xs sm:text-sm">
-                              {task.task_type === 'individu' 
-                                ? `${submissionStatus.submitted}/${submissionStatus.total} mentee`
-                                : task.task_type === 'per_sektor'
-                                ? `${submissionStatus.submitted}/${submissionStatus.total} sektor`
-                                : `${submissionStatus.submitted}/${submissionStatus.total} angkatan`
-                              }
-                            </span>
+                        {/* Progress Bar - Hidden for angkatan tasks */}
+                        {task.task_type !== 'angkatan' && (
+                          <div className="space-y-2">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 text-sm">
+                              <span>Progress Submission</span>
+                              <span className="text-xs sm:text-sm">
+                                {task.task_type === 'individu' 
+                                  ? `${submissionStatus.submitted}/${submissionStatus.total} mentee`
+                                  : `${submissionStatus.submitted}/${submissionStatus.total} sektor`
+                                }
+                              </span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
+                              ></div>
+                            </div>
                           </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                              style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
-                            ></div>
-                          </div>
-                        </div>
+                        )}
                       </div>
                     )
                   })
@@ -810,39 +850,40 @@ export function MentorDashboard({ user }: { user: User }) {
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-medium">Progress Submission</h4>
-                {(() => {
-                  const submissionStatus = getTaskSubmissionStatus(selectedTask.id)
-                  return (
-                    <div className="space-y-2 mt-2">
-                      <div className="flex justify-between text-sm">
-                        <span>
-                          {selectedTask.task_type === 'individu' 
-                            ? 'Mentee yang sudah mengumpulkan'
-                            : selectedTask.task_type === 'per_sektor'
-                            ? 'Sektor yang sudah mengumpulkan'
-                            : 'Angkatan yang sudah mengumpulkan'
-                          }
-                        </span>
-                        <span>{submissionStatus.submitted}/{submissionStatus.total}</span>
+              {/* Progress Submission - Hidden for angkatan tasks */}
+              {selectedTask.task_type !== 'angkatan' && (
+                <div>
+                  <h4 className="font-medium">Progress Submission</h4>
+                  {(() => {
+                    const submissionStatus = getTaskSubmissionStatus(selectedTask.id)
+                    return (
+                      <div className="space-y-2 mt-2">
+                        <div className="flex justify-between text-sm">
+                          <span>
+                            {selectedTask.task_type === 'individu' 
+                              ? 'Mentee yang sudah mengumpulkan'
+                              : 'Sektor yang sudah mengumpulkan'
+                            }
+                          </span>
+                          <span>{submissionStatus.submitted}/{submissionStatus.total}</span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
+                          ></div>
+                        </div>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>
+                            Belum dikumpulkan: {submissionStatus.pending} {selectedTask.task_type === 'individu' ? 'mentee' : 'sektor'}
+                          </span>
+                          <span>{Math.round((submissionStatus.submitted / submissionStatus.total) * 100)}% selesai</span>
+                        </div>
                       </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                          style={{ width: `${(submissionStatus.submitted / submissionStatus.total) * 100}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>
-                          Belum dikumpulkan: {submissionStatus.pending} {selectedTask.task_type === 'individu' ? 'mentee' : selectedTask.task_type === 'per_sektor' ? 'sektor' : 'angkatan'}
-                        </span>
-                        <span>{Math.round((submissionStatus.submitted / submissionStatus.total) * 100)}% selesai</span>
-                      </div>
-                    </div>
-                  )
-                })()}
-              </div>
+                    )
+                  })()}
+                </div>
+              )}
 
               <div>
                 <h4 className="font-medium">Mentee yang Sudah Mengumpulkan</h4>
