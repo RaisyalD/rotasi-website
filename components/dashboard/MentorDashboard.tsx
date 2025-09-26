@@ -438,17 +438,17 @@ export function MentorDashboard({ user }: { user: User }) {
       {/* Mentees, Tasks, and Submissions */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tasks">Tugas Sektor</TabsTrigger>
-          <TabsTrigger value="mentees">Daftar Mentee</TabsTrigger>
-          <TabsTrigger value="submissions">Submission Tugas</TabsTrigger>
+          <TabsTrigger value="tasks" className="text-xs sm:text-sm">Tugas Sektor</TabsTrigger>
+          <TabsTrigger value="mentees" className="text-xs sm:text-sm">Daftar Mentee</TabsTrigger>
+          <TabsTrigger value="submissions" className="text-xs sm:text-sm">Submission Tugas</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tasks" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}</span>
               </CardTitle>
               <CardDescription>
                 Daftar tugas yang diberikan oleh Divisi Acara untuk sektor Anda
@@ -471,19 +471,32 @@ export function MentorDashboard({ user }: { user: User }) {
                     
                     return (
                       <div key={task.id} className="border rounded-lg p-4 bg-card">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-lg">{task.title}</h3>
-                              <Badge variant="outline">Sektor {task.sector}</Badge>
-                              <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
-                            </div>
+                        <div className="mb-3">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-lg flex-1 pr-2">{task.title}</h3>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedTask(task)
+                                setTaskDetailDialog(true)
+                              }}
+                              className="flex-shrink-0"
+                            >
+                              <Eye className="h-4 w-4 sm:mr-2" />
+                              <span className="hidden sm:inline">Detail</span>
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Badge variant="outline">Sektor {task.sector}</Badge>
+                            <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
+                          </div>
                             <div className="mb-3">
                               {task.description.length > 100 ? (
                                 <div>
-                                  <p className={`text-sm text-muted-foreground whitespace-pre-wrap ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
+                                  <div className={`text-sm text-muted-foreground whitespace-pre-wrap break-words overflow-hidden ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
                                     {task.description}
-                                  </p>
+                                  </div>
                                   <button
                                     onClick={() => toggleDescription(task.id)}
                                     className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
@@ -502,40 +515,28 @@ export function MentorDashboard({ user }: { user: User }) {
                                   </button>
                                 </div>
                               ) : (
-                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                <div className="text-sm text-muted-foreground whitespace-pre-wrap break-words">
                                   {task.description}
-                                </p>
+                                </div>
                               )}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-4 w-4" />
-                                Deadline: {formatDateTime(task.due_date)}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Users className="h-4 w-4" />
-                                Progress: {submissionStatus.submitted}/{submissionStatus.total} {task.task_type === 'individu' ? 'mentee' : task.task_type === 'per_sektor' ? 'sektor' : 'angkatan'}
-                              </span>
-                            </div>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">Deadline: {formatDateTime(task.due_date)}</span>
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users className="h-4 w-4 flex-shrink-0" />
+                              <span className="truncate">Progress: {submissionStatus.submitted}/{submissionStatus.total} {task.task_type === 'individu' ? 'mentee' : task.task_type === 'per_sektor' ? 'sektor' : 'angkatan'}</span>
+                            </span>
                           </div>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              setSelectedTask(task)
-                              setTaskDetailDialog(true)
-                            }}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            Detail
-                          </Button>
                         </div>
                         
                         {/* Progress Bar */}
                         <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-0 text-sm">
                             <span>Progress Submission</span>
-                            <span>
+                            <span className="text-xs sm:text-sm">
                               {task.task_type === 'individu' 
                                 ? `${submissionStatus.submitted}/${submissionStatus.total} mentee`
                                 : task.task_type === 'per_sektor'
@@ -578,14 +579,14 @@ export function MentorDashboard({ user }: { user: User }) {
                   
                   return (
                     <div key={mentee.id} className="border rounded-lg p-4 bg-card">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold">{mentee.nama_lengkap}</h3>
-                          <p className="text-sm text-muted-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold truncate">{mentee.nama_lengkap}</h3>
+                          <p className="text-sm text-muted-foreground truncate">
                             NIM: {mentee.nim} • Email: {mentee.email}
                           </p>
                         </div>
-                        <Badge variant="outline">
+                        <Badge variant="outline" className="flex-shrink-0">
                           {menteeSubmissions.length} submission
                         </Badge>
                       </div>
@@ -639,14 +640,14 @@ export function MentorDashboard({ user }: { user: User }) {
               <div className="space-y-4">
                 {submissions.map((submission) => (
                   <div key={submission.id} className="border rounded-lg p-4 bg-card">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
-                        <p className="text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate">{submission.participants.nama_lengkap}</h3>
+                        <p className="text-sm text-muted-foreground truncate">
                           {(submission.tasks?.title ?? 'Tugas')} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {isSubmissionLate(submission.tasks, submission.submitted_at) && (
                           <Badge variant="destructive">Terlambat</Badge>
                         )}
@@ -654,16 +655,18 @@ export function MentorDashboard({ user }: { user: User }) {
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-muted p-3 rounded mb-3">
-                        <p className="text-sm">{submission.submission_text}</p>
+                      <div className="bg-muted p-3 rounded mb-3 max-h-40 overflow-y-auto">
+                        <p className="text-sm whitespace-pre-wrap break-words">{submission.submission_text}</p>
                       </div>
                     )}
                     
                     {submission.file_url && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{submission.file_name}</span>
-                        <Button size="sm" variant="outline" asChild>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm truncate">{submission.file_name}</span>
+                        </div>
+                        <Button size="sm" variant="outline" asChild className="flex-shrink-0">
                           <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
                             <Download className="h-3 w-3 mr-1" />
                             Download
@@ -790,8 +793,8 @@ export function MentorDashboard({ user }: { user: User }) {
               
               <div>
                 <h4 className="font-medium">Deskripsi Tugas</h4>
-                <div className="bg-muted p-3 rounded mt-2">
-                  <p className="text-sm whitespace-pre-wrap">{selectedTask.description}</p>
+                <div className="bg-muted p-3 rounded mt-2 max-h-60 overflow-y-auto">
+                  <p className="text-sm whitespace-pre-wrap break-words">{selectedTask.description}</p>
                 </div>
               </div>
 

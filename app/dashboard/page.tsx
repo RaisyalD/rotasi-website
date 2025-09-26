@@ -100,7 +100,7 @@ export default function DashboardPage() {
       case 'peserta':
         return 'Peserta ROTASI'
       case 'mentor':
-        return 'Mentor Sektor'
+        return 'Mentor'
       case 'acara':
         return 'Divisi Acara'
       case 'komdis':

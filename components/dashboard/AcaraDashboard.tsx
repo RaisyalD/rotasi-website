@@ -99,6 +99,7 @@ export function AcaraDashboard() {
   
   // Expandable description states
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
+  const [expandedTaskDescriptions, setExpandedTaskDescriptions] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     fetchAllData()
@@ -459,13 +460,13 @@ export function AcaraDashboard() {
         })
         setBulkEditDialog(false)
         setBulkEditTaskIds([])
-    setBulkEditData({
-      title: '',
-      description: '',
-      due_date: '',
-      due_time: '23:59',
+        setBulkEditData({
+          title: '',
+          description: '',
+          due_date: '',
+          due_time: '23:59',
       task_type: 'individu'
-    })
+        })
         fetchAllData()
       } else {
         const { toast } = await import('@/hooks/use-toast')
@@ -657,6 +658,18 @@ export function AcaraDashboard() {
         newSet.delete(taskId)
       } else {
         newSet.add(taskId)
+      }
+      return newSet
+    })
+  }
+
+  const toggleTaskDescription = (taskIndex: number) => {
+    setExpandedTaskDescriptions(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(taskIndex)) {
+        newSet.delete(taskIndex)
+      } else {
+        newSet.add(taskIndex)
       }
       return newSet
     })
@@ -975,20 +988,46 @@ export function AcaraDashboard() {
                     <div key={index} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
                       <div className="space-y-2">
                         <h3 className="font-semibold text-lg">{task.title}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {task.description}
-                        </p>
+                        <div>
+                                {task.description.length > 100 ? (
+                                  <div>
+                              <p className={`text-sm text-muted-foreground whitespace-pre-wrap break-words break-all ${!expandedTaskDescriptions.has(index) ? 'line-clamp-2' : ''}`}>
+                                      {task.description}
+                                    </p>
+                                    <button
+                                onClick={() => toggleTaskDescription(index)}
+                                      className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
+                                    >
+                                {expandedTaskDescriptions.has(index) ? (
+                                        <>
+                                          <ChevronUp className="h-3 w-3" />
+                                          Tampilkan Lebih Sedikit
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown className="h-3 w-3" />
+                                          Tampilkan Lebih Banyak
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all">
+                                    {task.description}
+                                  </p>
+                                )}
+                              </div>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
+                                <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
                             <Badge className={getTaskTypeBadgeStyle(task.task_type || 'individu')}>{getTaskTypeDisplay(task.task_type || 'individu')}</Badge>
-                          </div>
+                              </div>
                           <p className="text-xs text-muted-foreground">
                             Tugas dibuat untuk sektor 1-10
                           </p>
-                        </div>
+                            </div>
+                          </div>
                       </div>
-                    </div>
                   ))
                 })()}
               </div>
