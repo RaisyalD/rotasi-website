@@ -71,8 +71,7 @@ export function AcaraDashboard() {
     title: '',
     description: '',
     due_date: '',
-    due_time: '23:59',
-    status: 'active' as 'active' | 'completed' | 'cancelled'
+    due_time: '23:59'
   })
 
   // Bulk download states
@@ -384,8 +383,7 @@ export function AcaraDashboard() {
       title: '',
       description: '',
       due_date: '',
-      due_time: '23:59',
-      status: 'active'
+      due_time: '23:59'
     })
     setBulkEditDialog(true)
   }
@@ -442,8 +440,7 @@ export function AcaraDashboard() {
           title: '',
           description: '',
           due_date: '',
-          due_time: '23:59',
-          status: 'active'
+          due_time: '23:59'
         })
         fetchAllData()
       } else {
@@ -931,9 +928,6 @@ export function AcaraDashboard() {
                               <div className="flex items-center gap-4 mt-2">
                                 <Badge variant="outline">Sektor {task.sector}</Badge>
                                 <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
-                                <Badge variant={task.status === 'active' ? 'default' : 'secondary'}>
-                                  {task.status === 'active' ? 'Aktif' : 'Selesai'}
-                                </Badge>
                               </div>
                             </div>
                           </div>
@@ -1550,24 +1544,6 @@ export function AcaraDashboard() {
                 />
               </div>
 
-              <div>
-                <Label htmlFor="bulk-edit-status">Status</Label>
-                <Select
-                  value={bulkEditData.status}
-                  onValueChange={(value: 'active' | 'completed' | 'cancelled') => 
-                    setBulkEditData({...bulkEditData, status: value})
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Aktif</SelectItem>
-                    <SelectItem value="completed">Selesai</SelectItem>
-                    <SelectItem value="cancelled">Dibatalkan</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </div>
 
