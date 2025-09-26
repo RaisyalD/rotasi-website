@@ -101,6 +101,21 @@ export function AcaraDashboard() {
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
   const [expandedTaskDescriptions, setExpandedTaskDescriptions] = useState<Set<number>>(new Set())
 
+  // Helper function to get unique tasks (one per title)
+  const getUniqueTasks = () => {
+    const uniqueTasks: Task[] = []
+    const seenTitles = new Set<string>()
+    
+    tasks.forEach(task => {
+      if (!seenTitles.has(task.title)) {
+        seenTitles.add(task.title)
+        uniqueTasks.push(task)
+      }
+    })
+    
+    return uniqueTasks
+  }
+
   useEffect(() => {
     fetchAllData()
   }, [])
@@ -334,12 +349,22 @@ export function AcaraDashboard() {
           })
           return
         }
+
+        // Get all task IDs that have the same title as the selected unique tasks
+        const selectedUniqueTasks = getUniqueTasks().filter(task => selectedTaskIds.includes(task.id))
+        const allTaskIdsToDelete: string[] = []
+        
+        selectedUniqueTasks.forEach(uniqueTask => {
+          const tasksWithSameTitle = tasks.filter(task => task.title === uniqueTask.title)
+          allTaskIdsToDelete.push(...tasksWithSameTitle.map(task => task.id))
+        })
+
         response = await fetch('/api/tasks/bulk-delete', {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ taskIds: selectedTaskIds })
+          body: JSON.stringify({ taskIds: allTaskIdsToDelete })
         })
       }
 
@@ -385,10 +410,11 @@ export function AcaraDashboard() {
   }
 
   const handleSelectAllTasks = () => {
-    if (selectedTaskIds.length === tasks.length) {
+    const uniqueTasks = getUniqueTasks()
+    if (selectedTaskIds.length === uniqueTasks.length) {
       setSelectedTaskIds([])
     } else {
-      setSelectedTaskIds(tasks.map(task => task.id))
+      setSelectedTaskIds(uniqueTasks.map(task => task.id))
     }
   }
 
@@ -421,10 +447,11 @@ export function AcaraDashboard() {
   }
 
   const handleSelectAllBulkEditTasks = () => {
-    if (bulkEditTaskIds.length === tasks.length) {
+    const uniqueTasks = getUniqueTasks()
+    if (bulkEditTaskIds.length === uniqueTasks.length) {
       setBulkEditTaskIds([])
     } else {
-      setBulkEditTaskIds(tasks.map(task => task.id))
+      setBulkEditTaskIds(uniqueTasks.map(task => task.id))
     }
   }
 
@@ -436,13 +463,22 @@ export function AcaraDashboard() {
     }
 
     try {
+      // Get all task IDs that have the same title as the selected unique tasks
+      const selectedUniqueTasks = getUniqueTasks().filter(task => bulkEditTaskIds.includes(task.id))
+      const allTaskIdsToUpdate: string[] = []
+      
+      selectedUniqueTasks.forEach(uniqueTask => {
+        const tasksWithSameTitle = tasks.filter(task => task.title === uniqueTask.title)
+        allTaskIdsToUpdate.push(...tasksWithSameTitle.map(task => task.id))
+      })
+
       const response = await fetch('/api/tasks/bulk-update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          taskIds: bulkEditTaskIds,
+          taskIds: allTaskIdsToUpdate,
           updateData: {
             ...bulkEditData,
             due_date: bulkEditData.due_date ? `${bulkEditData.due_date}T${bulkEditData.due_time}:00+07:00` : bulkEditData.due_date
@@ -1286,7 +1322,7 @@ export function AcaraDashboard() {
           <DialogHeader>
             <DialogTitle>Pilih Tugas yang Akan Dihapus</DialogTitle>
             <DialogDescription>
-              Pilih tugas yang ingin dihapus dari {tasks.length} tugas yang tersedia
+              Pilih tugas yang ingin dihapus dari {getUniqueTasks().length} tugas yang tersedia
             </DialogDescription>
           </DialogHeader>
           
@@ -1296,18 +1332,18 @@ export function AcaraDashboard() {
                 <input
                   type="checkbox"
                   id="select-all"
-                  checked={selectedTaskIds.length === tasks.length && tasks.length > 0}
+                  checked={selectedTaskIds.length === getUniqueTasks().length && getUniqueTasks().length > 0}
                   onChange={handleSelectAllTasks}
                   className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="select-all" className="font-medium">
-                  Pilih Semua ({selectedTaskIds.length}/{tasks.length})
+                  Pilih Semua ({selectedTaskIds.length}/{getUniqueTasks().length})
                 </label>
               </div>
             </div>
 
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {tasks.map((task) => (
+              {getUniqueTasks().map((task) => (
                 <div key={task.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
                   <input
                     type="checkbox"
@@ -1320,7 +1356,7 @@ export function AcaraDashboard() {
                     <label htmlFor={`task-${task.id}`} className="block cursor-pointer">
                       <div className="font-medium text-sm">{task.title}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        Sektor {task.sector} • Deadline: {formatDateTime(task.due_date)}
+                        Semua Sektor • Deadline: {formatDateTime(task.due_date)}
                       </div>
                       <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                         {task.description}
@@ -1565,18 +1601,18 @@ export function AcaraDashboard() {
                   <input
                     type="checkbox"
                     id="select-all-bulk-edit"
-                    checked={bulkEditTaskIds.length === tasks.length && tasks.length > 0}
+                    checked={bulkEditTaskIds.length === getUniqueTasks().length && getUniqueTasks().length > 0}
                     onChange={handleSelectAllBulkEditTasks}
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <label htmlFor="select-all-bulk-edit" className="font-medium">
-                    Pilih Semua ({bulkEditTaskIds.length}/{tasks.length})
+                    Pilih Semua ({bulkEditTaskIds.length}/{getUniqueTasks().length})
                   </label>
                 </div>
               </div>
 
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {tasks.map((task) => (
+                {getUniqueTasks().map((task) => (
                   <div key={task.id} className="flex items-start space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
                   <input
                     type="checkbox"
@@ -1589,7 +1625,7 @@ export function AcaraDashboard() {
                       <label htmlFor={`bulk-edit-task-${task.id}`} className="block cursor-pointer">
                         <div className="font-medium text-sm">{task.title}</div>
                         <div className="text-xs text-gray-500 mt-1">
-                          Sektor {task.sector} • Deadline: {formatDateTime(task.due_date)}
+                          Semua Sektor • Deadline: {formatDateTime(task.due_date)}
                         </div>
                         <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                           {task.description}
