@@ -1162,6 +1162,11 @@ export function AcaraDashboard() {
                                     {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
                                   </p>
                                   <div className="mt-1">
+                                    <Badge className={getTaskTypeBadgeStyle(submission.tasks.task_type || 'individu')}>
+                                      {getTaskTypeDisplay(submission.tasks.task_type || 'individu')}
+                                    </Badge>
+                                  </div>
+                                  <div className="mt-1">
                                     {submission.tasks.description.length > 100 ? (
                                       <div>
                                         <p className={`text-sm text-gray-600 dark:text-gray-400 ${!expandedDescriptions.has(submission.tasks.id) ? 'line-clamp-2' : ''}`}>
