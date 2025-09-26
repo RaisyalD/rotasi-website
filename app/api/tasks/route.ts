@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('Received task creation request:', body)
     const { title, description, sector, due_date, userId } = body
 
     if (!title || !description || !sector || !due_date || !userId) {
@@ -95,8 +96,17 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Create task error:', error)
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    })
     return NextResponse.json(
-      { error: 'Gagal membuat tugas' },
+      { 
+        error: 'Gagal membuat tugas',
+        details: error.message || 'Unknown error'
+      },
       { status: 500 }
     )
   }

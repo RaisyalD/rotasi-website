@@ -160,6 +160,7 @@ export function AcaraDashboard() {
     }
   }
 
+
   const handleCreateTask = async () => {
     if (!newTask.title || !newTask.description || !newTask.due_date || !newTask.due_time) {
       const { toast } = await import('@/hooks/use-toast')
@@ -176,6 +177,13 @@ export function AcaraDashboard() {
     setIsCreatingTask(true)
 
     try {
+      console.log('Creating task with data:', {
+        title: newTask.title,
+        description: newTask.description,
+        due_date: newTask.due_date,
+        due_time: newTask.due_time,
+        userId: currentUser.id
+      })
       // Create tasks for all sectors
       const createPromises = sectors.map(sector => 
         fetch('/api/tasks', {
@@ -197,6 +205,9 @@ export function AcaraDashboard() {
       const results = await Promise.all(responses.map(res => res.json()))
 
       const successCount = results.filter(result => result.success).length
+      const failedResults = results.filter(result => !result.success)
+      
+      console.log('Task creation results:', results)
       
       if (successCount > 0) {
         const { toast } = await import('@/hooks/use-toast')
@@ -205,7 +216,12 @@ export function AcaraDashboard() {
         fetchAllData()
       } else {
         const { toast } = await import('@/hooks/use-toast')
-        toast({ title: 'Gagal', description: 'Gagal membuat tugas' })
+        const errorMessage = failedResults.length > 0 ? failedResults[0].error || failedResults[0].details || 'Gagal membuat tugas' : 'Gagal membuat tugas'
+        toast({ 
+          title: 'Gagal', 
+          description: errorMessage,
+          variant: 'destructive'
+        })
       }
     } catch (error) {
       console.error('Error creating task:', error)
@@ -436,12 +452,12 @@ export function AcaraDashboard() {
         })
         setBulkEditDialog(false)
         setBulkEditTaskIds([])
-        setBulkEditData({
-          title: '',
-          description: '',
-          due_date: '',
-          due_time: '23:59'
-        })
+    setBulkEditData({
+      title: '',
+      description: '',
+      due_date: '',
+      due_time: '23:59'
+    })
         fetchAllData()
       } else {
         const { toast } = await import('@/hooks/use-toast')
@@ -881,61 +897,44 @@ export function AcaraDashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {[...Array(10)].map((_, idx) => {
-                  const sectorNumber = idx + 1
-                  const sectorTasks = tasks
-                    .filter((t) => t.sector === sectorNumber)
+              <div className="space-y-4">
+                {(() => {
+                  // Group tasks by title and due_date to avoid duplicates
+                  const groupedTasks = tasks.reduce((acc, task) => {
+                    const key = `${task.title}-${task.due_date}`
+                    if (!acc[key]) {
+                      acc[key] = {
+                        title: task.title,
+                        description: task.description,
+                        due_date: task.due_date,
+                        sectors: new Set<number>()
+                      }
+                    }
+                    acc[key].sectors.add(task.sector)
+                    return acc
+                  }, {} as Record<string, { title: string; description: string; due_date: string; sectors: Set<number> }>)
+
+                  // Convert to array and sort by due_date
+                  const uniqueTasks = Object.values(groupedTasks)
                     .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
-                  if (sectorTasks.length === 0) return null
-                  return (
-                    <div key={sectorNumber} className="space-y-3">
-                      <h3 className="text-lg font-semibold">Sektor {sectorNumber} : {SECTOR_NAME[sectorNumber] ?? `Sektor ${sectorNumber}`}</h3>
-                      <div className="space-y-3">
-                        {sectorTasks.map((task) => (
-                          <div key={task.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
-                            <div className="flex-1">
-                              <h3 className="font-semibold">{task.title}</h3>
-                              <div className="mt-2">
-                                {task.description.length > 100 ? (
-                                  <div>
-                                    <p className={`text-sm text-muted-foreground whitespace-pre-wrap break-words break-all ${!expandedDescriptions.has(task.id) ? 'line-clamp-3' : ''}`}>
-                                      {task.description}
-                                    </p>
-                                    <button
-                                      onClick={() => toggleDescription(task.id)}
-                                      className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 mt-1 transition-colors"
-                                    >
-                                      {expandedDescriptions.has(task.id) ? (
-                                        <>
-                                          <ChevronUp className="h-3 w-3" />
-                                          Tampilkan Lebih Sedikit
-                                        </>
-                                      ) : (
-                                        <>
-                                          <ChevronDown className="h-3 w-3" />
-                                          Tampilkan Lebih Banyak
-                                        </>
-                                      )}
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <p className="text-sm text-muted-foreground whitespace-pre-wrap break-words break-all">
-                                    {task.description}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-4 mt-2">
-                                <Badge variant="outline">Sektor {task.sector}</Badge>
-                                <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+
+                  return uniqueTasks.map((task, index) => (
+                    <div key={index} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold text-lg">{task.title}</h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {task.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
+                          <p className="text-xs text-muted-foreground">
+                            Tugas dibuat untuk sektor 1-10
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  )
-                })}
+                  ))
+                })()}
               </div>
             </CardContent>
           </Card>
@@ -1543,6 +1542,7 @@ export function AcaraDashboard() {
                   rows={3}
                 />
               </div>
+
 
             </div>
           </div>
