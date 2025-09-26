@@ -14,6 +14,7 @@ import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/hooks/use-toast'
 
 
 interface Task {
@@ -43,6 +44,7 @@ interface TaskSubmission {
 
 export function PesertaDashboard({ user }: { user: User }) {
   const { user: currentUser } = useAuth()
+  const { toast } = useToast()
   const [tasks, setTasks] = useState<Task[]>([])
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
   const [mentor, setMentor] = useState<User | null>(null)
@@ -129,14 +131,22 @@ export function PesertaDashboard({ user }: { user: User }) {
     // Validate file type
     const isZip = file.type === 'application/zip' || file.name.toLowerCase().endsWith('.zip')
     if (!isZip) {
-      alert('Hanya file .zip yang diperbolehkan')
+      toast({
+        title: "Format File Tidak Valid",
+        description: "Hanya file .zip yang diperbolehkan",
+        variant: "destructive"
+      })
       return false
     }
 
     // Validate file size (10MB)
     const maxBytes = 10 * 1024 * 1024
     if (file.size > maxBytes) {
-      alert('Ukuran file maksimal 10MB')
+      toast({
+        title: "Ukuran File Terlalu Besar",
+        description: "Ukuran file maksimal 10MB",
+        variant: "destructive"
+      })
       return false
     }
 
@@ -172,7 +182,11 @@ export function PesertaDashboard({ user }: { user: User }) {
 
   const handleUpload = async () => {
     if (!selectedTask || (!uploadForm.file && !editingSubmission)) {
-      alert('Harap upload file tugas dalam format ZIP')
+      toast({
+        title: "File Tugas Diperlukan",
+        description: "Harap upload file tugas dalam format ZIP",
+        variant: "destructive"
+      })
       return
     }
 
@@ -310,8 +324,6 @@ export function PesertaDashboard({ user }: { user: User }) {
     try {
       const submitted = new Date(submittedAt)
       const deadline = new Date(task.due_date)
-      // treat deadline as end of day local time
-      deadline.setHours(23, 59, 59, 999)
       return submitted.getTime() > deadline.getTime()
     } catch {
       return false
@@ -478,10 +490,9 @@ export function PesertaDashboard({ user }: { user: User }) {
                           {(() => {
                             const now = new Date()
                             const deadline = new Date(task.due_date)
-                            deadline.setHours(23, 59, 59, 999)
                             if (now.getTime() > deadline.getTime()) {
                               return (
-                                <Badge variant="destructive">Melewati deadline</Badge>
+                                <Badge variant="destructive">Terlambat</Badge>
                               )
                             }
                             return null

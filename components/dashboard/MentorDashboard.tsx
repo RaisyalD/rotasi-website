@@ -128,7 +128,6 @@ export function MentorDashboard({ user }: { user: User }) {
     try {
       const submitted = new Date(submittedAt)
       const deadline = new Date(task.due_date)
-      deadline.setHours(23, 59, 59, 999)
       return submitted.getTime() > deadline.getTime()
     } catch {
       return false
@@ -295,7 +294,6 @@ export function MentorDashboard({ user }: { user: User }) {
     try {
       const now = new Date()
       const deadline = new Date(task.due_date)
-      deadline.setHours(23, 59, 59, 999)
       return now.getTime() > deadline.getTime()
     } catch {
       return false
@@ -413,12 +411,6 @@ export function MentorDashboard({ user }: { user: User }) {
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="font-semibold text-lg">{task.title}</h3>
                               <Badge variant="outline">Sektor {task.sector}</Badge>
-                              {isOverdue && (
-                                <Badge variant="destructive">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Terlambat
-                                </Badge>
-                              )}
                             </div>
                             <div className="mb-3">
                               {task.description.length > 100 ? (
@@ -717,14 +709,8 @@ export function MentorDashboard({ user }: { user: User }) {
                 </div>
                 <div>
                   <h4 className="font-medium">Deadline</h4>
-                  <div className="text-sm text-muted-foreground flex items-center">
+                  <div className="text-sm text-muted-foreground">
                     <span>{new Date(selectedTask.due_date).toLocaleDateString('id-ID')}</span>
-                    {isTaskOverdue(selectedTask) && (
-                      <Badge variant="destructive" className="ml-2">
-                        <Clock className="h-3 w-3 mr-1" />
-                        Terlambat
-                      </Badge>
-                    )}
                   </div>
                 </div>
               </div>
@@ -780,11 +766,19 @@ export function MentorDashboard({ user }: { user: User }) {
                     .filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated'))
                     .map((submission) => (
                       <div key={submission.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <div>
-                          <p className="text-sm font-medium">{submission.participants.nama_lengkap}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                          </p>
+                        <div className="flex items-center gap-2">
+                          <div>
+                            <p className="text-sm font-medium">{submission.participants.nama_lengkap}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
+                            </p>
+                          </div>
+                          {isSubmissionLate(submission.tasks, submission.submitted_at) && (
+                            <Badge variant="destructive">
+                              <Clock className="h-3 w-3 mr-1" />
+                              Terlambat
+                            </Badge>
+                          )}
                         </div>
                         <Badge variant="outline">
                           {submission.status === 'submitted' ? 'Dikumpulkan' : 'Dievaluasi'}
