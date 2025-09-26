@@ -781,7 +781,7 @@ export function AcaraDashboard() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tasks.length}</div>
+            <div className="text-2xl font-bold">{new Set(tasks.map(task => task.title)).size}</div>
             <p className="text-xs text-muted-foreground">
               tugas dibuat
             </p>
