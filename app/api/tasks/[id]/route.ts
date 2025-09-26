@@ -7,7 +7,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { title, description, sector, due_date, status } = body
+    const { title, description, sector, due_date, task_type, status } = body
 
     const cookieUserId = request.cookies.get('rotasi_session')?.value
     if (!cookieUserId) {
@@ -44,6 +44,7 @@ export async function PUT(
         ...(description !== undefined ? { description } : {}),
         ...(sector !== undefined ? { sector: parseInt(sector) } : {}),
         ...(due_date !== undefined ? { due_date } : {}),
+        ...(task_type !== undefined ? { task_type } : {}),
         ...(status !== undefined ? { status } : {}),
       })
       .eq('id', params.id)

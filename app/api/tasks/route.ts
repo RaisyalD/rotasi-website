@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     console.log('Received task creation request:', body)
-    const { title, description, sector, due_date, userId } = body
+    const { title, description, sector, due_date, task_type, userId } = body
 
     if (!title || !description || !sector || !due_date || !userId) {
       return NextResponse.json(
@@ -80,6 +80,7 @@ export async function POST(request: NextRequest) {
         description,
         sector: parseInt(sector),
         due_date,
+        task_type,
         created_by: userId
       })
       .select()

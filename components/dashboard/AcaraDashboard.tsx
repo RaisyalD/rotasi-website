@@ -30,6 +30,7 @@ interface Task {
   sector: number
   due_date: string
   status: 'active' | 'completed' | 'cancelled'
+  task_type: 'individu' | 'per_sektor' | 'angkatan'
   created_at: string
 }
 
@@ -71,7 +72,8 @@ export function AcaraDashboard() {
     title: '',
     description: '',
     due_date: '',
-    due_time: '23:59'
+    due_time: '23:59',
+    task_type: 'individu' as 'individu' | 'per_sektor' | 'angkatan'
   })
 
   // Bulk download states
@@ -85,7 +87,8 @@ export function AcaraDashboard() {
     title: '',
     description: '',
     due_date: '',
-    due_time: '23:59'
+    due_time: '23:59',
+    task_type: 'individu' as 'individu' | 'per_sektor' | 'angkatan'
   })
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const [isDeletingTasks, setIsDeletingTasks] = useState(false)
@@ -196,6 +199,7 @@ export function AcaraDashboard() {
             description: newTask.description,
             sector: sector.sector_number,
             due_date: `${newTask.due_date}T${newTask.due_time}:00+07:00`,
+            task_type: newTask.task_type,
             userId: currentUser.id
           })
         })
@@ -212,7 +216,7 @@ export function AcaraDashboard() {
       if (successCount > 0) {
         const { toast } = await import('@/hooks/use-toast')
         toast({ title: 'Berhasil', description: `Tugas berhasil dibuat untuk ${successCount} sektor` })
-        setNewTask({ title: '', description: '', due_date: '', due_time: '23:59' })
+        setNewTask({ title: '', description: '', due_date: '', due_time: '23:59', task_type: 'individu' })
         fetchAllData()
       } else {
         const { toast } = await import('@/hooks/use-toast')
@@ -247,7 +251,8 @@ export function AcaraDashboard() {
       title: task.title,
       description: task.description,
       due_date: dateStr,
-      due_time: timeStr
+      due_time: timeStr,
+      task_type: task.task_type
     })
     setEditTaskDialog(true)
   }
@@ -264,7 +269,8 @@ export function AcaraDashboard() {
         body: JSON.stringify({
           title: newTask.title,
           description: newTask.description,
-          due_date: `${newTask.due_date}T${newTask.due_time}:00+07:00`
+          due_date: `${newTask.due_date}T${newTask.due_time}:00+07:00`,
+          task_type: newTask.task_type
         })
       })
 
@@ -399,7 +405,8 @@ export function AcaraDashboard() {
       title: '',
       description: '',
       due_date: '',
-      due_time: '23:59'
+      due_time: '23:59',
+      task_type: 'individu'
     })
     setBulkEditDialog(true)
   }
@@ -456,7 +463,8 @@ export function AcaraDashboard() {
       title: '',
       description: '',
       due_date: '',
-      due_time: '23:59'
+      due_time: '23:59',
+      task_type: 'individu'
     })
         fetchAllData()
       } else {
@@ -685,6 +693,32 @@ export function AcaraDashboard() {
     }
   }
 
+  const getTaskTypeDisplay = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'Individu'
+      case 'per_sektor':
+        return 'Per Sektor'
+      case 'angkatan':
+        return 'Angkatan'
+      default:
+        return 'Individu'
+    }
+  }
+
+  const getTaskTypeBadgeStyle = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700' // Hijau
+      case 'per_sektor':
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700' // Kuning
+      case 'angkatan':
+        return 'bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-600 dark:text-white dark:border-blue-500' // Biru
+      default:
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700'
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -817,6 +851,24 @@ export function AcaraDashboard() {
                 </div>
               </div>
               <div>
+                <Label htmlFor="task-type">Jenis Tugas</Label>
+                <Select
+                  value={newTask.task_type}
+                  onValueChange={(value: 'individu' | 'per_sektor' | 'angkatan') => 
+                    setNewTask({...newTask, task_type: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jenis tugas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individu">Individu</SelectItem>
+                    <SelectItem value="per_sektor">Per Sektor</SelectItem>
+                    <SelectItem value="angkatan">Angkatan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label htmlFor="task-description">Deskripsi Tugas</Label>
                 <Textarea
                   id="task-description"
@@ -907,12 +959,13 @@ export function AcaraDashboard() {
                         title: task.title,
                         description: task.description,
                         due_date: task.due_date,
+                        task_type: task.task_type,
                         sectors: new Set<number>()
                       }
                     }
                     acc[key].sectors.add(task.sector)
                     return acc
-                  }, {} as Record<string, { title: string; description: string; due_date: string; sectors: Set<number> }>)
+                  }, {} as Record<string, { title: string; description: string; due_date: string; task_type: string; sectors: Set<number> }>)
 
                   // Convert to array and sort by due_date
                   const uniqueTasks = Object.values(groupedTasks)
@@ -926,7 +979,10 @@ export function AcaraDashboard() {
                           {task.description}
                         </p>
                         <div className="flex items-center justify-between">
-                          <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
+                            <Badge className={getTaskTypeBadgeStyle(task.task_type || 'individu')}>{getTaskTypeDisplay(task.task_type || 'individu')}</Badge>
+                          </div>
                           <p className="text-xs text-muted-foreground">
                             Tugas dibuat untuk sektor 1-10
                           </p>
@@ -1145,6 +1201,24 @@ export function AcaraDashboard() {
                     onClick={() => openTimePicker('edit')}
                   />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-task-type">Jenis Tugas</Label>
+                <Select
+                  value={newTask.task_type}
+                  onValueChange={(value: 'individu' | 'per_sektor' | 'angkatan') => 
+                    setNewTask({...newTask, task_type: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jenis tugas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individu">Individu</SelectItem>
+                    <SelectItem value="per_sektor">Per Sektor</SelectItem>
+                    <SelectItem value="angkatan">Angkatan</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
@@ -1542,7 +1616,24 @@ export function AcaraDashboard() {
                   rows={3}
                 />
               </div>
-
+              <div>
+                <Label htmlFor="bulk-edit-task-type">Jenis Tugas</Label>
+                <Select
+                  value={bulkEditData.task_type}
+                  onValueChange={(value: 'individu' | 'per_sektor' | 'angkatan') => 
+                    setBulkEditData({...bulkEditData, task_type: value})
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jenis tugas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="individu">Individu</SelectItem>
+                    <SelectItem value="per_sektor">Per Sektor</SelectItem>
+                    <SelectItem value="angkatan">Angkatan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
             </div>
           </div>

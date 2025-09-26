@@ -21,6 +21,7 @@ interface Task {
   sector: number
   due_date: string
   status: 'active' | 'completed' | 'cancelled'
+  task_type: 'individu' | 'per_sektor' | 'angkatan'
   created_at: string
 }
 
@@ -131,6 +132,32 @@ export function MentorDashboard({ user }: { user: User }) {
       return submitted.getTime() > deadline.getTime()
     } catch {
       return false
+    }
+  }
+
+  const getTaskTypeDisplay = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'Individu'
+      case 'per_sektor':
+        return 'Per Sektor'
+      case 'angkatan':
+        return 'Angkatan'
+      default:
+        return 'Individu'
+    }
+  }
+
+  const getTaskTypeBadgeStyle = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700' // Hijau
+      case 'per_sektor':
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700' // Kuning
+      case 'angkatan':
+        return 'bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-600 dark:text-white dark:border-blue-500' // Biru
+      default:
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700'
     }
   }
 
@@ -306,12 +333,49 @@ export function MentorDashboard({ user }: { user: User }) {
   }
 
   const getTaskSubmissionStatus = (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId)
+    if (!task) return { total: 0, submitted: 0, pending: 0 }
+
     const taskSubmissions = submissions.filter(sub => sub.task_id === taskId)
-    const submittedCount = taskSubmissions.filter(sub => sub.status === 'submitted' || sub.status === 'evaluated').length
-    return {
-      total: mentees.length,
-      submitted: submittedCount,
-      pending: mentees.length - submittedCount
+    const submittedSubmissions = taskSubmissions.filter(sub => sub.status === 'submitted' || sub.status === 'evaluated')
+
+    switch (task.task_type) {
+      case 'individu':
+        // Progress per mentee individual
+        return {
+          total: mentees.length,
+          submitted: submittedSubmissions.length,
+          pending: mentees.length - submittedSubmissions.length
+        }
+      
+      case 'per_sektor':
+        // Progress per sektor - 1 submission dari sektor tersebut = 100% untuk sektor itu
+        const sectorMentees = mentees.filter(mentee => mentee.sektor === task.sector)
+        const hasSectorSubmission = submittedSubmissions.some(sub => {
+          const mentee = mentees.find(m => m.id === sub.participant_id)
+          return mentee && mentee.sektor === task.sector
+        })
+        return {
+          total: 1, // 1 sektor
+          submitted: hasSectorSubmission ? 1 : 0,
+          pending: hasSectorSubmission ? 0 : 1
+        }
+      
+      case 'angkatan':
+        // Progress per angkatan - 1 submission dari semua sektor = 100%
+        const hasAngkatanSubmission = submittedSubmissions.length > 0
+        return {
+          total: 1, // 1 angkatan
+          submitted: hasAngkatanSubmission ? 1 : 0,
+          pending: hasAngkatanSubmission ? 0 : 1
+        }
+      
+      default:
+        return {
+          total: mentees.length,
+          submitted: submittedSubmissions.length,
+          pending: mentees.length - submittedSubmissions.length
+        }
     }
   }
 
@@ -412,6 +476,7 @@ export function MentorDashboard({ user }: { user: User }) {
                             <div className="flex items-center gap-2 mb-2">
                               <h3 className="font-semibold text-lg">{task.title}</h3>
                               <Badge variant="outline">Sektor {task.sector}</Badge>
+                              <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
                             </div>
                             <div className="mb-3">
                               {task.description.length > 100 ? (
@@ -449,7 +514,7 @@ export function MentorDashboard({ user }: { user: User }) {
                               </span>
                               <span className="flex items-center gap-1">
                                 <Users className="h-4 w-4" />
-                                Progress: {submissionStatus.submitted}/{submissionStatus.total}
+                                Progress: {submissionStatus.submitted}/{submissionStatus.total} {task.task_type === 'individu' ? 'mentee' : task.task_type === 'per_sektor' ? 'sektor' : 'angkatan'}
                               </span>
                             </div>
                           </div>
@@ -470,7 +535,14 @@ export function MentorDashboard({ user }: { user: User }) {
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Progress Submission</span>
-                            <span>{submissionStatus.submitted}/{submissionStatus.total} mentee</span>
+                            <span>
+                              {task.task_type === 'individu' 
+                                ? `${submissionStatus.submitted}/${submissionStatus.total} mentee`
+                                : task.task_type === 'per_sektor'
+                                ? `${submissionStatus.submitted}/${submissionStatus.total} sektor`
+                                : `${submissionStatus.submitted}/${submissionStatus.total} angkatan`
+                              }
+                            </span>
                           </div>
                           <div className="w-full bg-muted rounded-full h-2">
                             <div 
@@ -742,7 +814,14 @@ export function MentorDashboard({ user }: { user: User }) {
                   return (
                     <div className="space-y-2 mt-2">
                       <div className="flex justify-between text-sm">
-                        <span>Mentee yang sudah mengumpulkan</span>
+                        <span>
+                          {selectedTask.task_type === 'individu' 
+                            ? 'Mentee yang sudah mengumpulkan'
+                            : selectedTask.task_type === 'per_sektor'
+                            ? 'Sektor yang sudah mengumpulkan'
+                            : 'Angkatan yang sudah mengumpulkan'
+                          }
+                        </span>
                         <span>{submissionStatus.submitted}/{submissionStatus.total}</span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2">
@@ -752,7 +831,9 @@ export function MentorDashboard({ user }: { user: User }) {
                         ></div>
                       </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Belum dikumpulkan: {submissionStatus.pending}</span>
+                        <span>
+                          Belum dikumpulkan: {submissionStatus.pending} {selectedTask.task_type === 'individu' ? 'mentee' : selectedTask.task_type === 'per_sektor' ? 'sektor' : 'angkatan'}
+                        </span>
                         <span>{Math.round((submissionStatus.submitted / submissionStatus.total) * 100)}% selesai</span>
                       </div>
                     </div>

@@ -24,6 +24,7 @@ interface Task {
   sector: number
   due_date: string
   status: 'active' | 'completed' | 'cancelled'
+  task_type: 'individu' | 'per_sektor' | 'angkatan'
   created_at: string
 }
 
@@ -300,7 +301,7 @@ export function PesertaDashboard({ user }: { user: User }) {
     } catch (error) {
       console.error('Upload error:', error)
       const { toast } = await import('@/hooks/use-toast')
-      toast({ title: 'Gagal', description: 'Gagal mengupload tugas' })
+      toast({ title: 'Gagal', description: 'Gagal mengirim tugas' })
       setUploadProgress(0)
     } finally {
       setIsUploading(false)
@@ -327,6 +328,32 @@ export function PesertaDashboard({ user }: { user: User }) {
       return submitted.getTime() > deadline.getTime()
     } catch {
       return false
+    }
+  }
+
+  const getTaskTypeDisplay = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'Individu'
+      case 'per_sektor':
+        return 'Per Sektor'
+      case 'angkatan':
+        return 'Angkatan'
+      default:
+        return 'Individu'
+    }
+  }
+
+  const getTaskTypeBadgeStyle = (taskType: string) => {
+    switch (taskType) {
+      case 'individu':
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700' // Hijau
+      case 'per_sektor':
+        return 'bg-yellow-100 text-yellow-800 border border-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700' // Kuning
+      case 'angkatan':
+        return 'bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-600 dark:text-white dark:border-blue-500' // Biru
+      default:
+        return 'bg-green-100 text-green-800 border border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700'
     }
   }
 
@@ -452,6 +479,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                           <Badge variant="outline">
                             Sektor {task.sector}
                           </Badge>
+                          <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
                         </div>
                       </div>
                       
@@ -609,7 +637,7 @@ export function PesertaDashboard({ user }: { user: User }) {
       }}>
         <DialogContent className="max-w-md max-h-[90vh] mx-4 sm:mx-auto">
           <DialogHeader>
-            <DialogTitle>{editingSubmission ? 'Edit Tugas' : 'Upload Tugas'}</DialogTitle>
+            <DialogTitle>{editingSubmission ? 'Edit Tugas' : 'Kirim Tugas'}</DialogTitle>
             <DialogDescription>
               {selectedTask?.title}
             </DialogDescription>
@@ -665,7 +693,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      File siap diupload. Klik "Upload Tugas" untuk melanjutkan.
+                      File siap diupload. Klik "Kirim" untuk melanjutkan.
                     </p>
                   </div>
                 ) : (
@@ -708,7 +736,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    File siap diupload. Klik "Upload Tugas" untuk melanjutkan.
+                    File siap diupload. Klik "Kirim" untuk melanjutkan.
                   </p>
                 </div>
               )}
@@ -751,7 +779,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                 </div>
                 <Progress value={uploadProgress} className="w-full transition-all duration-300 ease-out" />
                 <p className="text-xs text-muted-foreground">
-                  {uploadProgress < 100 ? 'Mengupload tugas...' : 'Upload selesai!'}
+                  {uploadProgress < 100 ? 'Mengirim tugas...' : 'Kirim selesai!'}
                 </p>
               </div>
             )}
@@ -769,7 +797,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                 disabled={isUploading}
                 className="w-full sm:w-auto min-h-[44px]"
               >
-                {isUploading ? (editingSubmission ? 'Mengupdate...' : 'Mengupload...') : (editingSubmission ? 'Update Tugas' : 'Upload Tugas')}
+                {isUploading ? (editingSubmission ? 'Mengupdate...' : 'Mengirim...') : (editingSubmission ? 'Update Tugas' : 'Kirim')}
               </Button>
             </div>
           </div>

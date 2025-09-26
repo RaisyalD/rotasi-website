@@ -61,6 +61,7 @@ export async function PUT(request: NextRequest) {
     if (updateData.title !== undefined) updatePayload.title = updateData.title
     if (updateData.description !== undefined) updatePayload.description = updateData.description
     if (updateData.due_date !== undefined) updatePayload.due_date = updateData.due_date
+    if (updateData.task_type !== undefined) updatePayload.task_type = updateData.task_type
     if (updateData.status !== undefined) updatePayload.status = updateData.status
 
     // Update tasks
