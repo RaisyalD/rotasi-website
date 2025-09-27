@@ -706,7 +706,7 @@ export function MentorDashboard({ user }: { user: User }) {
                           <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm truncate">{submission.file_name}</span>
                         </div>
-                        <Button size="sm" variant="outline" asChild className="flex-shrink-0">
+                        <Button size="sm" variant="outline" asChild className="flex-shrink-0 w-full sm:w-auto">
                           <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
                             <Download className="h-3 w-3 mr-1" />
                             Download
@@ -722,10 +722,11 @@ export function MentorDashboard({ user }: { user: User }) {
                       </div>
                     )}
                     
-                    <div className="flex justify-end">
+                    <div className="flex flex-col sm:flex-row sm:justify-end gap-2">
                       <Button 
                         size="sm" 
                         variant="outline"
+                        className="flex-shrink-0 w-full sm:w-auto"
                         onClick={() => {
                           setSelectedSubmission(submission)
                           setDetailDialog(true)
@@ -782,7 +783,7 @@ export function MentorDashboard({ user }: { user: User }) {
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">{selectedSubmission.file_name}</span>
-                    <Button size="sm" variant="outline" asChild>
+                    <Button size="sm" variant="outline" asChild className="flex-shrink-0">
                       <a href={selectedSubmission.file_url} target="_blank" rel="noopener noreferrer">
                         <Download className="h-3 w-3 mr-1" />
                         Download
@@ -969,7 +970,7 @@ export function MentorDashboard({ user }: { user: User }) {
                   id="select-all-download"
                   checked={selectedDownloadTaskIds.length === tasks.length && tasks.length > 0}
                   onChange={handleSelectAllDownloadTasks}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                 />
                 <label htmlFor="select-all-download" className="font-medium">
                   Pilih Semua ({selectedDownloadTaskIds.length}/{tasks.length})
@@ -989,7 +990,7 @@ export function MentorDashboard({ user }: { user: User }) {
                       id={`download-task-${task.id}`}
                       checked={selectedDownloadTaskIds.includes(task.id)}
                       onChange={() => handleDownloadTaskSelection(task.id)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="mt-1 h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                     />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`download-task-${task.id}`} className="block cursor-pointer">
