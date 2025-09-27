@@ -92,6 +92,7 @@ export function AcaraDashboard() {
   })
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const [isDeletingTasks, setIsDeletingTasks] = useState(false)
+  const [isUpdatingTasks, setIsUpdatingTasks] = useState(false)
   
   // Time picker states
   const [timePickerOpen, setTimePickerOpen] = useState(false)
@@ -497,6 +498,7 @@ export function AcaraDashboard() {
       return
     }
 
+    setIsUpdatingTasks(true)
     try {
       // Get all task IDs that have the same title as the selected unique tasks
       const selectedUniqueTasks = getUniqueTasks().filter(task => bulkEditTaskIds.includes(task.id))
@@ -547,6 +549,8 @@ export function AcaraDashboard() {
       console.error('Error bulk updating tasks:', error)
       const { toast } = await import('@/hooks/use-toast')
       toast({ title: 'Gagal', description: 'Gagal mengupdate tugas' })
+    } finally {
+      setIsUpdatingTasks(false)
     }
   }
 
@@ -988,7 +992,6 @@ export function AcaraDashboard() {
               <div className="space-y-4">
                 <div>
                   <CardTitle>Daftar Tugas per Sektor</CardTitle>
-                  <CardDescription>Urut sektor 1 sampai 10 • Total: {tasks.length} tugas</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -1112,7 +1115,6 @@ export function AcaraDashboard() {
               <div className="space-y-4">
                 <div>
                   <CardTitle>Submission Tugas Terstruktur per Sektor</CardTitle>
-                  <CardDescription>Urut sektor 1 sampai 10 • Total: {submissions.length} submission</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -1374,7 +1376,7 @@ export function AcaraDashboard() {
                   id="select-all"
                   checked={selectedTaskIds.length === getUniqueTasks().length && getUniqueTasks().length > 0}
                   onChange={handleSelectAllTasks}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                 />
                 <label htmlFor="select-all" className="font-medium">
                   Pilih Semua ({selectedTaskIds.length}/{getUniqueTasks().length})
@@ -1390,7 +1392,7 @@ export function AcaraDashboard() {
                     id={`task-${task.id}`}
                     checked={selectedTaskIds.includes(task.id)}
                     onChange={() => handleTaskSelection(task.id)}
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-1 h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                   />
                   <div className="flex-1 min-w-0">
                     <label htmlFor={`task-${task.id}`} className="block cursor-pointer">
@@ -1548,7 +1550,7 @@ export function AcaraDashboard() {
                   id="select-all-download"
                   checked={selectedDownloadTaskIds.length === tasks.length && tasks.length > 0}
                   onChange={handleSelectAllDownloadTasks}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                 />
                 <label htmlFor="select-all-download" className="font-medium">
                   Pilih Semua ({selectedDownloadTaskIds.length}/{tasks.length})
@@ -1568,7 +1570,7 @@ export function AcaraDashboard() {
                       id={`download-task-${task.id}`}
                       checked={selectedDownloadTaskIds.includes(task.id)}
                       onChange={() => handleDownloadTaskSelection(task.id)}
-                      className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="mt-1 h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                     />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`download-task-${task.id}`} className="block cursor-pointer">
@@ -1643,7 +1645,7 @@ export function AcaraDashboard() {
                     id="select-all-bulk-edit"
                     checked={bulkEditTaskIds.length === getUniqueTasks().length && getUniqueTasks().length > 0}
                     onChange={handleSelectAllBulkEditTasks}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                   />
                   <label htmlFor="select-all-bulk-edit" className="font-medium">
                     Pilih Semua ({bulkEditTaskIds.length}/{getUniqueTasks().length})
@@ -1659,7 +1661,7 @@ export function AcaraDashboard() {
                     id={`bulk-edit-task-${task.id}`}
                     checked={bulkEditTaskIds.includes(task.id)}
                     onChange={() => handleBulkEditTaskSelection(task.id)}
-                    className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-1 h-1 w-1 sm:h-4 sm:w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 scale-50 sm:scale-100"
                   />
                     <div className="flex-1 min-w-0">
                       <label htmlFor={`bulk-edit-task-${task.id}`} className="block cursor-pointer">
@@ -1767,11 +1769,21 @@ export function AcaraDashboard() {
               </Button>
               <Button 
                 onClick={handleBulkUpdate}
-                disabled={bulkEditTaskIds.length === 0}
+                disabled={bulkEditTaskIds.length === 0 || isUpdatingTasks}
                 className="w-full sm:w-auto"
               >
-                <span className="hidden sm:inline">Update {bulkEditTaskIds.length} Tugas</span>
-                <span className="sm:hidden">Update {bulkEditTaskIds.length}</span>
+                {isUpdatingTasks ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    <span className="hidden sm:inline">Updating...</span>
+                    <span className="sm:hidden">Updating...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">Update {bulkEditTaskIds.length} Tugas</span>
+                    <span className="sm:hidden">Update {bulkEditTaskIds.length}</span>
+                  </>
+                )}
               </Button>
             </div>
           </div>

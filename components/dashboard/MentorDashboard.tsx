@@ -695,8 +695,8 @@ export function MentorDashboard({ user }: { user: User }) {
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-muted p-3 rounded mb-3 max-h-40 overflow-y-auto">
-                        <p className="text-sm whitespace-pre-wrap break-words">{submission.submission_text}</p>
+                      <div className="bg-muted p-4 rounded mb-3 max-h-40 overflow-y-auto pr-4">
+                        <p className="text-sm whitespace-pre-wrap break-words pr-2">{submission.submission_text}</p>
                       </div>
                     )}
                     
@@ -770,8 +770,8 @@ export function MentorDashboard({ user }: { user: User }) {
               {selectedSubmission.submission_text && (
                 <div>
                   <h4 className="font-medium">Submission Text</h4>
-                  <div className="bg-muted p-3 rounded">
-                    <p className="text-sm">{selectedSubmission.submission_text}</p>
+                  <div className="bg-muted p-4 rounded pr-4">
+                    <p className="text-sm pr-2">{selectedSubmission.submission_text}</p>
                   </div>
                 </div>
               )}
@@ -807,15 +807,15 @@ export function MentorDashboard({ user }: { user: User }) {
 
       {/* Task Detail Dialog */}
       <Dialog open={taskDetailDialog} onOpenChange={setTaskDetailDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Detail Tugas</DialogTitle>
             <DialogDescription>
               {selectedTask?.title}
             </DialogDescription>
           </DialogHeader>
           {selectedTask && (
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-medium">Sektor</h4>
@@ -833,22 +833,11 @@ export function MentorDashboard({ user }: { user: User }) {
               
               <div>
                 <h4 className="font-medium">Deskripsi Tugas</h4>
-                <div className="bg-muted p-3 rounded mt-2 max-h-60 overflow-y-auto">
-                  <p className="text-sm whitespace-pre-wrap break-words">{selectedTask.description}</p>
+                <div className="bg-muted p-4 rounded mt-2 max-h-48 overflow-y-auto pr-4">
+                  <p className="text-sm whitespace-pre-wrap break-words pr-2">{selectedTask.description}</p>
                 </div>
               </div>
 
-              <div>
-                <h4 className="font-medium">Status Tugas</h4>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant={selectedTask.status === 'active' ? 'default' : 'secondary'}>
-                    {selectedTask.status === 'active' ? 'Aktif' : selectedTask.status === 'completed' ? 'Selesai' : 'Dibatalkan'}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    Dibuat: {new Date(selectedTask.created_at).toLocaleDateString('id-ID')}
-                  </span>
-                </div>
-              </div>
 
               {/* Progress Submission - Hidden for angkatan tasks */}
               {selectedTask.task_type !== 'angkatan' && (
@@ -887,33 +876,35 @@ export function MentorDashboard({ user }: { user: User }) {
 
               <div>
                 <h4 className="font-medium">Mentee yang Sudah Mengumpulkan</h4>
-                <div className="space-y-2 mt-2 max-h-40 overflow-y-auto">
-                  {submissions
-                    .filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated'))
-                    .map((submission) => (
-                      <div key={submission.id} className="flex items-center justify-between p-2 bg-muted rounded">
-                        <div className="flex items-center gap-2">
-                          <div>
-                            <p className="text-sm font-medium">{submission.participants.nama_lengkap}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
-                            </p>
+                <div className="space-y-2 mt-2 max-h-48 overflow-y-auto pr-4">
+                  <div className="pr-2">
+                    {submissions
+                      .filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated'))
+                      .map((submission) => (
+                        <div key={submission.id} className="flex items-center justify-between p-2 bg-muted rounded mb-2">
+                          <div className="flex items-center gap-2">
+                            <div>
+                              <p className="text-sm font-medium">{submission.participants.nama_lengkap}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
+                              </p>
+                            </div>
+                            {isSubmissionLate(submission.tasks, submission.submitted_at) && (
+                              <Badge variant="destructive">
+                                <Clock className="h-3 w-3 mr-1" />
+                                Terlambat
+                              </Badge>
+                            )}
                           </div>
-                          {isSubmissionLate(submission.tasks, submission.submitted_at) && (
-                            <Badge variant="destructive">
-                              <Clock className="h-3 w-3 mr-1" />
-                              Terlambat
-                            </Badge>
-                          )}
+                          <Badge variant="outline">
+                            {submission.status === 'submitted' ? 'Dikumpulkan' : 'Dievaluasi'}
+                          </Badge>
                         </div>
-                        <Badge variant="outline">
-                          {submission.status === 'submitted' ? 'Dikumpulkan' : 'Dievaluasi'}
-                        </Badge>
-                      </div>
-                    ))}
-                  {submissions.filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated')).length === 0 && (
-                    <p className="text-sm text-muted-foreground italic">Belum ada mentee yang mengumpulkan tugas ini</p>
-                  )}
+                      ))}
+                    {submissions.filter(sub => sub.task_id === selectedTask.id && (sub.status === 'submitted' || sub.status === 'evaluated')).length === 0 && (
+                      <p className="text-sm text-muted-foreground italic">Belum ada mentee yang mengumpulkan tugas ini</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
