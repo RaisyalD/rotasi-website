@@ -1,0 +1,73 @@
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  let supabaseResponse = NextResponse.next({
+    request,
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          supabaseResponse = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
+  // issues with users being randomly logged out.
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  // If there's no user and the user is trying to access a protected route,
+  // redirect them to the login page
+  const hasAppSession = Boolean(request.cookies.get('rotasi_session')?.value)
+
+  if (!user && !hasAppSession && request.nextUrl.pathname.startsWith('/dashboard')) {
+    const redirectUrl = new URL('/auth/login', request.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // If there's a user and they're trying to access any auth pages, redirect them to dashboard
+  // Allow bypass with ?allow=1 so user can switch accounts
+  const allowAuthPage = request.nextUrl.searchParams.get('allow') === '1'
+  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+  const isRegisterDivisi = request.nextUrl.pathname.startsWith('/auth/register-divisi')
+  // Only redirect away from auth pages if Supabase auth user exists.
+  // Do NOT rely on custom app cookie here to avoid redirect loops when localStorage user is absent.
+  if (!isRegisterDivisi && !allowAuthPage && user && isAuthPage) {
+    const redirectUrl = new URL('/dashboard', request.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  return supabaseResponse
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
