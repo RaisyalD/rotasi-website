@@ -316,3 +316,17 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     @apply mr-auto ml-8;
   }
 }
+
+/* Marquee Animation for Running Text */
+@keyframes marquee {
+  0% {
+    transform: translateX(100vw);
+  }
+  100% {
+    transform: translateX(-100vw);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
