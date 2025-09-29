@@ -517,12 +517,23 @@ export function PesertaDashboard({ user }: { user: User }) {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span>Deadline: {formatDateTime(task.due_date)}</span>
                           {(() => {
-                            const now = new Date()
-                            const deadline = new Date(task.due_date)
-                            if (now.getTime() > deadline.getTime()) {
-                              return (
-                                <Badge variant="destructive">Terlambat</Badge>
-                              )
+                            const submission = submissions.find(sub => sub.task_id === task.id)
+                            if (submission) {
+                              // Jika sudah submit, cek apakah submit terlambat
+                              if (isSubmissionLate(task, submission.submitted_at)) {
+                                return (
+                                  <Badge variant="destructive">Terlambat</Badge>
+                                )
+                              }
+                            } else {
+                              // Jika belum submit, cek apakah deadline sudah lewat
+                              const now = new Date()
+                              const deadline = new Date(task.due_date)
+                              if (now.getTime() > deadline.getTime()) {
+                                return (
+                                  <Badge variant="destructive">Terlambat</Badge>
+                                )
+                              }
                             }
                             return null
                           })()}
