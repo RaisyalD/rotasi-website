@@ -140,12 +140,12 @@ export function PesertaDashboard({ user }: { user: User }) {
       return false
     }
 
-    // Validate file size (4.5MB)
-    const maxBytes = 4.5 * 1024 * 1024
+    // Validate file size (10MB)
+    const maxBytes = 10 * 1024 * 1024
     if (file.size > maxBytes) {
       toast({
         title: "Ukuran File Terlalu Besar",
-        description: "Ukuran file maksimal 4.5MB",
+        description: "Ukuran file maksimal 10MB",
         variant: "destructive"
       })
       return false
@@ -715,7 +715,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                         {isDragOver ? 'Lepas file di sini' : 'Drag & drop file ZIP atau klik untuk memilih'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Format: ZIP • Maksimal : 4MB
+                        Format: ZIP • Maksimal: 10MB
                       </p>
                     </div>
                   </div>
@@ -775,7 +775,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                 </Button>
                 {isMobile && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Format: ZIP • Maksimal : 4MB
+                    Format: ZIP • Maksimal: 10MB
                   </p>
                 )}
               </div>
