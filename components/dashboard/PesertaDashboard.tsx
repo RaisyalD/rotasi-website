@@ -715,7 +715,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                         {isDragOver ? 'Lepas file di sini' : 'Drag & drop file ZIP atau klik untuk memilih'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Format: ZIP • Maksimal: 4.5MB
+                        Format: ZIP • Maksimal: 10MB
                       </p>
                     </div>
                   </div>
@@ -775,7 +775,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                 </Button>
                 {isMobile && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Format: ZIP • Maksimal: 4.5MB
+                    Format: ZIP • Maksimal: 10MB
                   </p>
                 )}
               </div>
