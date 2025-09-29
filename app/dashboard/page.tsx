@@ -131,7 +131,7 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white p-3 rounded-lg overflow-hidden">
               <div className="animate-marquee whitespace-nowrap">
                 <span className="inline-block mr-8">
-                  Saat ini limit upload file turun menjadi 4.5MB. Harap kompres file kamu supaya kamu dapat mengupload tugas dengan sukses
+                  Saat ini limit upload file turun menjadi 4MB. Harap kompres file kamu supaya kamu dapat mengupload tugas dengan sukses
                 </span>
               </div>
             </div>
