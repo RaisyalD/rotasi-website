@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Calendar, GraduationCap, Upload, FileText, Eye, Download, AlertTriangle, Edit, FileIcon, X, ChevronDown, ChevronUp } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
-import { User } from '@/lib/supabase'
+import { User, supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 
@@ -140,7 +140,7 @@ export function PesertaDashboard({ user }: { user: User }) {
       return false
     }
 
-    // Validate file size (10MB)
+    // Validate file size (4.5MB)
     const maxBytes = 10 * 1024 * 1024
     if (file.size > maxBytes) {
       toast({
@@ -198,7 +198,7 @@ export function PesertaDashboard({ user }: { user: User }) {
       let fileUrl = ''
       let fileName = ''
 
-      // Upload file if exists
+      // Upload file using API (which uses service role key)
       if (uploadForm.file) {
         const formData = new FormData()
         formData.append('file', uploadForm.file)
@@ -715,7 +715,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                         {isDragOver ? 'Lepas file di sini' : 'Drag & drop file ZIP atau klik untuk memilih'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Format: ZIP • Maksimal: 10MB
+                        Format: ZIP • Maksimal : 10MB
                       </p>
                     </div>
                   </div>
@@ -775,7 +775,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                 </Button>
                 {isMobile && (
                   <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Format: ZIP • Maksimal: 10MB
+                    Format: ZIP • Maksimal : 10MB
                   </p>
                 )}
               </div>
