@@ -57,6 +57,8 @@ export function Navbar() {
       window.location.href = '/auth/login-mentor'
     } else if (userRole === 'acara') {
       window.location.href = '/auth/login-acara'
+    } else if (userRole === 'admin') {
+      window.location.href = '/auth/login-admin'
     } else {
       // Default to peserta login page
       window.location.href = '/auth/login'
@@ -67,11 +69,16 @@ export function Navbar() {
     setShowLogoutDialog(true)
   }
 
-  // Check if current page is divisi acara or mentor login/register pages
+  // Check if current page is divisi acara, mentor, or admin login/register pages
   const isDivisiAcaraOrMentorPage = pathname?.startsWith('/auth/login-acara') || 
                                    pathname?.startsWith('/auth/register-acara') ||
                                    pathname?.startsWith('/auth/login-mentor') || 
-                                   pathname?.startsWith('/auth/register-mentor')
+                                   pathname?.startsWith('/auth/register-mentor') ||
+                                   pathname?.startsWith('/auth/login-admin') || 
+                                   pathname?.startsWith('/auth/register-admin')
+  
+  // Check if current page is admin dashboard
+  const isAdminDashboardPage = pathname?.startsWith('/admin/dashboard')
   
   // Check if we're on homepage (where navbar should be white when not scrolled)
   const isHomePage = pathname === '/'
@@ -81,11 +88,14 @@ export function Navbar() {
 
   // Check if we should hide the download link
   const shouldHideDownloadLink = () => {
-    // Hide download link for divisi acara and mentor pages
+    // Hide download link for divisi acara, mentor, and admin pages
     if (isDivisiAcaraOrMentorPage) return true
     
-    // Hide download link for divisi acara and mentor dashboard pages
-    if (user?.role === 'acara' || user?.role === 'mentor') return true
+    // Hide download link for admin dashboard page
+    if (isAdminDashboardPage) return true
+    
+    // Hide download link for divisi acara, mentor, and admin dashboard pages
+    if (user?.role === 'acara' || user?.role === 'mentor' || user?.role === 'admin') return true
     
     // Show download link for peserta and other cases
     return false
@@ -170,8 +180,8 @@ export function Navbar() {
                 </div>
               </div>
             ) : (
-              // Only show register/login dropdown if not on divisi acara or mentor pages
-              !isDivisiAcaraOrMentorPage && (
+              // Only show register/login dropdown if not on divisi acara, mentor, admin pages, or admin dashboard
+              !isDivisiAcaraOrMentorPage && !isAdminDashboardPage && (
                 <div className="relative group">
                   <Button variant="outline" className="flex items-center gap-2">
                     Daftar
@@ -250,8 +260,8 @@ export function Navbar() {
                 </button>
               </div>
             ) : (
-              // Only show register/login options if not on divisi acara or mentor pages
-              !isDivisiAcaraOrMentorPage && (
+              // Only show register/login options if not on divisi acara, mentor, admin pages, or admin dashboard
+              !isDivisiAcaraOrMentorPage && !isAdminDashboardPage && (
                 <div className="border-t border-border/50 pt-2 mt-2">
                   <p className="text-xs font-semibold mb-1 text-foreground/60">Daftar</p>
                   <Link href="/auth/register-divisi?allow=1" className="block py-2 text-sm hover:text-primary" onClick={() => setIsOpen(false)}>

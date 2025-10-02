@@ -37,6 +37,8 @@ export function LogoutConfirmDialog({
         return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login Divisi Mentor dan harus login kembali untuk mengakses dashboard.'
       case 'acara':
         return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login Divisi Acara dan harus login kembali untuk mengakses dashboard.'
+        case 'admin':
+        return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login admin dan harus login kembali untuk mengakses dashboard.'
       default:
         return 'Setelah keluar dari akun, Anda akan diarahkan ke halaman login peserta dan harus login kembali untuk mengakses dashboard.'
     }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authService } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,25 +9,59 @@ export async function POST(request: NextRequest) {
 
     let user
 
-    switch (userType) {
-      case 'peserta':
-        user = await authService.loginPeserta(data)
-        break
-      case 'mentor':
-        user = await authService.loginMentor(data)
-        break
-      case 'acara':
-      case 'komdis':
-        user = await authService.loginDivisi({
-          ...data,
-          role: userType
-        })
-        break
-      default:
+    // For admin login, use service role to bypass RLS
+    if (userType === 'admin') {
+      if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
         return NextResponse.json(
-          { error: 'Tipe user tidak valid' },
+          { error: 'Server storage not configured. Missing SUPABASE_SERVICE_ROLE_KEY or URL.' },
+          { status: 500 }
+        )
+      }
+
+      const admin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+      )
+
+      const { data: userData, error } = await admin
+        .from('users')
+        .select('*')
+        .eq('email', data.email)
+        .eq('role', 'admin')
+        .eq('login_password_hash', data.loginPassword)
+        .eq('is_active', true)
+        .single()
+
+      if (error || !userData) {
+        return NextResponse.json(
+          { error: 'Data login tidak valid' },
           { status: 400 }
         )
+      }
+
+      user = userData
+    } else {
+      // Use existing authService for other user types
+      switch (userType) {
+        case 'peserta':
+          user = await authService.loginPeserta(data)
+          break
+        case 'mentor':
+          user = await authService.loginMentor(data)
+          break
+        case 'acara':
+          user = await authService.loginDivisi({
+            ...data,
+            role: userType
+          })
+          break
+        default:
+          return NextResponse.json(
+            { error: 'Tipe user tidak valid' },
+            { status: 400 }
+          )
+      }
     }
 
     const response = NextResponse.json({

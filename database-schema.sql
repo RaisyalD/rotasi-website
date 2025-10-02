@@ -26,7 +26,7 @@ CREATE TABLE users (
     nama_lengkap VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE,
     nim VARCHAR(20) UNIQUE,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('peserta', 'mentor', 'acara', 'komdis')),
+    role VARCHAR(20) NOT NULL CHECK (role IN ('peserta', 'mentor', 'acara', 'admin')),
     sektor INTEGER,
     password_hash VARCHAR(255),
     login_password_hash VARCHAR(255),
@@ -43,6 +43,7 @@ CREATE TABLE tasks (
     sector INTEGER NOT NULL,
     due_date TIMESTAMP WITH TIME ZONE NOT NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'completed', 'cancelled')),
+    task_type VARCHAR(20) DEFAULT 'individu' CHECK (task_type IN ('individu', 'per_sektor', 'angkatan')),
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -80,7 +81,7 @@ INSERT INTO sector_passwords (sector_number, sector_name, uuid_password) VALUES
 -- Insert division passwords
 INSERT INTO division_passwords (division_name, uuid_password) VALUES
 ('Divisi Acara', 'acara-2024'),
-('Komdis', 'komdis-2024');
+('Admin', 'admin-2024');
 
 -- Create indexes for better performance
 CREATE INDEX idx_users_role ON users(role);
@@ -129,12 +130,10 @@ CREATE POLICY "Acara can view all data" ON users
         )
     );
 
-CREATE POLICY "Komdis can view all data" ON users
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM users u 
-            WHERE u.id = auth.uid() 
-            AND u.role = 'komdis'
+CREATE POLICY "Admin can view all data" ON users
+    FOR ALL USING (
+        auth.uid() IN (
+            SELECT id FROM users WHERE role = 'admin'
         )
     );
 
@@ -183,11 +182,9 @@ CREATE POLICY "Acara can view all submissions" ON task_submissions
         )
     );
 
-CREATE POLICY "Komdis can view all submissions" ON task_submissions
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM users u 
-            WHERE u.id = auth.uid() 
-            AND u.role = 'komdis'
+CREATE POLICY "Admin can view all submissions" ON task_submissions
+    FOR ALL USING (
+        auth.uid() IN (
+            SELECT id FROM users WHERE role = 'admin'
         )
     ); 

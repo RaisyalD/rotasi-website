@@ -140,7 +140,7 @@ export function PesertaDashboard({ user }: { user: User }) {
       return false
     }
 
-    // Validate file size (4.5MB)
+    // Validate file size (4.5MB - Vercel limit)
     const maxBytes = 4.5 * 1024 * 1024
     if (file.size > maxBytes) {
       toast({
@@ -198,7 +198,7 @@ export function PesertaDashboard({ user }: { user: User }) {
       let fileUrl = ''
       let fileName = ''
 
-      // Upload file using API (which uses service role key)
+      // Upload using API route (bypasses RLS issues with service role key)
       if (uploadForm.file) {
         const formData = new FormData()
         formData.append('file', uploadForm.file)
@@ -245,9 +245,19 @@ export function PesertaDashboard({ user }: { user: User }) {
           xhr.send(formData)
         })
 
-        const uploadData = await uploadPromise
-        fileUrl = uploadData.fileUrl
-        fileName = uploadData.fileName
+        try {
+          const uploadData = await uploadPromise
+          fileUrl = uploadData.fileUrl
+          fileName = uploadData.fileName
+        } catch (error: any) {
+          toast({
+            title: "Upload Gagal",
+            description: error.message || "Terjadi kesalahan saat upload file",
+            variant: "destructive"
+          })
+          setIsUploading(false)
+          return
+        }
       } else if (editingSubmission) {
         // Keep existing file if no new file uploaded
         fileUrl = editingSubmission.file_url || ''

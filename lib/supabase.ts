@@ -11,7 +11,7 @@ export interface User {
   nama_lengkap: string
   email?: string
   nim?: string
-  role: 'peserta' | 'mentor' | 'acara' | 'komdis'
+  role: 'peserta' | 'mentor' | 'acara' | 'admin'
   sektor?: number
   password_hash?: string
   login_password_hash?: string
@@ -139,13 +139,13 @@ export const authService = {
     email: string
     loginPassword: string
     divisionPassword: string
-    role: 'acara' | 'komdis'
+    role: 'acara' | 'admin'
   }) {
     // Validate division password
     const { data: divisionData, error: divisionError } = await supabase
       .from('division_passwords')
       .select('*')
-      .eq('division_name', data.role === 'acara' ? 'Divisi Acara' : 'Komdis')
+      .eq('division_name', data.role === 'acara' ? 'Divisi Acara' : 'Admin')
       .eq('uuid_password', data.divisionPassword)
       .single()
 
@@ -229,7 +229,7 @@ export const authService = {
   async loginDivisi(data: {
     email: string
     loginPassword: string
-    role: 'acara' | 'komdis'
+    role: 'acara' | 'admin'
   }) {
     const { data: user, error } = await supabase
       .from('users')
@@ -312,6 +312,7 @@ export const authService = {
     description: string
     sector: number
     due_date: string
+    task_type?: string
     created_by: string
   }) {
     const { data: task, error } = await supabase
@@ -321,6 +322,7 @@ export const authService = {
         description: data.description,
         sector: data.sector,
         due_date: data.due_date,
+        task_type: data.task_type || 'individu',
         created_by: data.created_by
       })
       .select()
@@ -335,6 +337,7 @@ export const authService = {
     description?: string
     sector?: number
     due_date?: string
+    task_type?: string
     status?: string
   }) {
     const { data: task, error } = await supabase

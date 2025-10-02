@@ -21,6 +21,9 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!isLoading && !user && !isLoggingOut) {
       router.push('/auth/login')
+    } else if (!isLoading && user && user.role === 'admin') {
+      // Redirect admin users to admin dashboard
+      router.push('/admin/dashboard')
     }
   }, [user, isLoading, router, isLoggingOut])
 
@@ -55,6 +58,8 @@ export default function DashboardPage() {
       window.location.href = '/auth/login-mentor'
     } else if (userRole === 'acara') {
       window.location.href = '/auth/login-acara'
+    } else if (userRole === 'admin') {
+      window.location.href = '/auth/login-admin'
     } else {
       // Default to peserta login page
       window.location.href = '/auth/login'
@@ -73,8 +78,8 @@ export default function DashboardPage() {
         return <GraduationCap className="h-6 w-6" />
       case 'acara':
         return <Calendar className="h-6 w-6" />
-      case 'komdis':
-        return <User className="h-6 w-6" />
+      case 'admin':
+        return <Shield className="h-6 w-6" />
       default:
         return <User className="h-6 w-6" />
     }
@@ -88,8 +93,8 @@ export default function DashboardPage() {
         return 'bg-green-100 text-green-800'
       case 'acara':
         return 'bg-orange-100 text-orange-800'
-      case 'komdis':
-        return 'bg-gray-100 text-gray-800'
+      case 'admin':
+        return 'bg-purple-100 text-purple-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -103,8 +108,8 @@ export default function DashboardPage() {
         return 'Mentor'
       case 'acara':
         return 'Divisi Acara'
-      case 'komdis':
-        return 'User'
+      case 'admin':
+        return 'Admin'
       default:
         return role
     }
@@ -131,7 +136,7 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white p-3 rounded-lg overflow-hidden">
               <div className="animate-marquee whitespace-nowrap">
                 <span className="inline-block mr-8">
-                  Saat ini limit upload file turun menjadi 4MB. Harap kompres file kamu supaya kamu dapat mengupload tugas dengan sukses
+                  Saat ini limit upload file turun menjadi 4MB. Harap kompres file supaya kamu dapat mengupload tugas dengan sukses | Contact center admin website ROTASI : hi@web.rotasipsti.id
                 </span>
               </div>
             </div>

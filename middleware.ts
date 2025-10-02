@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
   // redirect them to the login page
   const hasAppSession = Boolean(request.cookies.get('rotasi_session')?.value)
 
-  if (!user && !hasAppSession && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (!user && !hasAppSession && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
     const redirectUrl = new URL('/auth/login', request.url)
     return NextResponse.redirect(redirectUrl)
   }

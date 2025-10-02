@@ -6,7 +6,7 @@ import { SafeStorage, initWebViewCompatibility } from '@/lib/webview-utils'
 interface User {
   id: string
   nama_lengkap: string
-  role: 'peserta' | 'mentor' | 'acara' | 'komdis'
+  role: 'peserta' | 'mentor' | 'acara' | 'admin'
   sektor?: number
   email?: string
   nim?: string
