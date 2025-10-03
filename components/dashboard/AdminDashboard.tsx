@@ -256,6 +256,24 @@ export function AdminDashboard() {
     }
   }
 
+  const getSectorBadgeStyle = (sectorNumber: number) => {
+    const colors = [
+      'bg-red-100 text-red-800 border-red-300 dark:bg-red-900 dark:text-red-200 dark:border-red-700',     // Sektor 1
+      'bg-orange-100 text-orange-800 border-orange-300 dark:bg-orange-900 dark:text-orange-200 dark:border-orange-700', // Sektor 2
+      'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-200 dark:border-yellow-700', // Sektor 3
+      'bg-green-100 text-green-800 border-green-300 dark:bg-green-900 dark:text-green-200 dark:border-green-700',       // Sektor 4
+      'bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900 dark:text-emerald-200 dark:border-emerald-700', // Sektor 5
+      'bg-teal-100 text-teal-800 border-teal-300 dark:bg-teal-900 dark:text-teal-200 dark:border-teal-700',             // Sektor 6
+      'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-900 dark:text-cyan-200 dark:border-cyan-700',             // Sektor 7
+      'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700',             // Sektor 8
+      'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-200 dark:border-indigo-700', // Sektor 9
+      'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900 dark:text-purple-200 dark:border-purple-700' // Sektor 10
+    ]
+    
+    const index = (sectorNumber - 1) % colors.length
+    return colors[index]
+  }
+
   if (isLoading) {
     return (
       <div className="text-center py-8">
@@ -411,7 +429,7 @@ export function AdminDashboard() {
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
                                       <h4 className="font-medium text-sm sm:text-base truncate">{participant.nama_lengkap}</h4>
-                                      <Badge variant="outline" className="text-xs shrink-0">Sektor {participant.sektor}</Badge>
+                                      <Badge variant="outline" className={`text-xs shrink-0 ${getSectorBadgeStyle(participant.sektor ?? 1)}`}>Sektor {participant.sektor}</Badge>
                                     </div>
                                     {participant.nim && (
                                       <p className="text-xs sm:text-sm text-muted-foreground">NIM: {participant.nim}</p>
@@ -419,11 +437,6 @@ export function AdminDashboard() {
                                     {participant.email && (
                                       <p className="text-xs sm:text-sm text-muted-foreground truncate">{participant.email}</p>
                                     )}
-                                    <div className="flex items-center gap-2">
-                                      <Badge className={`${getRoleBadgeStyle(participant.role)} text-xs`}>
-                                        {getRoleDisplay(participant.role)}
-                                      </Badge>
-                                    </div>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -464,7 +477,7 @@ export function AdminDashboard() {
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
                                       <h4 className="font-medium text-sm sm:text-base truncate">{participant.nama_lengkap}</h4>
-                                      <Badge variant="outline" className="text-xs shrink-0">Sektor {participant.sektor}</Badge>
+                                      <Badge variant="outline" className={`text-xs shrink-0 ${getSectorBadgeStyle(participant.sektor ?? 1)}`}>Sektor {participant.sektor}</Badge>
                                     </div>
                                     {participant.nim && (
                                       <p className="text-xs sm:text-sm text-muted-foreground">NIM: {participant.nim}</p>
@@ -472,11 +485,6 @@ export function AdminDashboard() {
                                     {participant.email && (
                                       <p className="text-xs sm:text-sm text-muted-foreground truncate">{participant.email}</p>
                                     )}
-                                    <div className="flex items-center gap-2">
-                                      <Badge className={`${getRoleBadgeStyle(participant.role)} text-xs`}>
-                                        {getRoleDisplay(participant.role)}
-                                      </Badge>
-                                    </div>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -560,7 +568,7 @@ export function AdminDashboard() {
                                 <div className="space-y-1">
                                   <div className="flex items-start justify-between gap-2">
                                     <h5 className="font-medium text-xs sm:text-sm truncate">{mentor.nama_lengkap}</h5>
-                                    <Badge variant="outline" className="text-xs shrink-0">
+                                    <Badge variant="outline" className={`text-xs shrink-0 ${getSectorBadgeStyle(mentor.sektor ?? 1)}`}>
                                       Sektor {mentor.sektor}
                                     </Badge>
                                   </div>

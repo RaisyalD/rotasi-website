@@ -136,7 +136,7 @@ export default function DashboardPage() {
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white p-3 rounded-lg overflow-hidden">
               <div className="animate-marquee whitespace-nowrap">
                 <span className="inline-block mr-8">
-                  Saat ini limit upload file turun menjadi 4MB. Harap kompres file supaya kamu dapat mengupload tugas dengan sukses | Contact center admin website ROTASI : hi@web.rotasipsti.id
+                  Website utama down? Kunjungi web.rotasipsti.id untuk alternatif link. Akun dan tugas tetap sama seperti website utama.
                 </span>
               </div>
             </div>
