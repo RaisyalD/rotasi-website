@@ -863,7 +863,7 @@ export function AcaraDashboard() {
           </CardContent>
         </Card>
         
-        <Card className="sm:col-span-2 lg:col-span-1">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Submission</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
