@@ -60,6 +60,7 @@ export function AdminDashboard() {
   
   // Sector filter state
   const [selectedSector, setSelectedSector] = useState<string>('none')
+  const [selectedSectorParticipants, setSelectedSectorParticipants] = useState<string>('all')
 
   useEffect(() => {
     fetchAllData()
@@ -354,52 +355,138 @@ export function AdminDashboard() {
         <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Data Peserta Terdaftar
-              </CardTitle>
-              <CardDescription>
-                Daftar semua peserta yang terdaftar di sistem
-              </CardDescription>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Data Peserta Terdaftar
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    Daftar semua peserta yang terdaftar di sistem
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <Select value={selectedSectorParticipants} onValueChange={setSelectedSectorParticipants}>
+                    <SelectTrigger className="w-full sm:w-[200px] [&>span]:justify-start [&>span]:gap-0 [&>span]:text-left">
+                      <SelectValue placeholder="Pilih Sektor" />
+                    </SelectTrigger>
+                    <SelectContent position="popper" side="bottom" align="end" className="max-h-[200px] overflow-y-auto">
+                      <SelectItem value="all">Semua Sektor</SelectItem>
+                      {[...Array(10)].map((_, idx) => {
+                        const sectorNumber = idx + 1
+                        return (
+                          <SelectItem key={sectorNumber} value={sectorNumber.toString()}>
+                            Sektor {sectorNumber} - {SECTOR_NAME[sectorNumber as number] ?? `Sektor ${sectorNumber}`}
+                          </SelectItem>
+                        )
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {sectors.map((sector) => (
-                  <div key={sector.sector_number} className="space-y-3">
-                    <h3 className="text-lg font-semibold">
-                      {sector.sector_name} - {SECTOR_NAME[sector.sector_number as number] ?? `Sektor ${sector.sector_number}`}
-                    </h3>
-                    {sector.participants.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Belum ada peserta</p>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                        {sector.participants.map((participant) => (
-                          <Card key={participant.id} className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-3 md:p-4">
-                              <div className="space-y-2">
-                                <div className="flex items-start justify-between gap-2">
-                                  <h4 className="font-medium text-sm sm:text-base truncate">{participant.nama_lengkap}</h4>
-                                  <Badge variant="outline" className="text-xs shrink-0">Sektor {participant.sektor}</Badge>
-                                </div>
-                                {participant.nim && (
-                                  <p className="text-xs sm:text-sm text-muted-foreground">NIM: {participant.nim}</p>
-                                )}
-                                {participant.email && (
-                                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{participant.email}</p>
-                                )}
-                                <div className="flex items-center gap-2">
-                                  <Badge className={`${getRoleBadgeStyle(participant.role)} text-xs`}>
-                                    {getRoleDisplay(participant.role)}
-                                  </Badge>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
+                {(() => {
+                  // Filter sectors based on selected sector
+                  const filteredSectors = selectedSectorParticipants === 'all' 
+                    ? sectors 
+                    : sectors.filter((sector) => sector.sector_number === parseInt(selectedSectorParticipants))
+
+                  if (selectedSectorParticipants === 'all') {
+                    // Show all sectors
+                    return sectors.map((sector) => (
+                      <div key={sector.sector_number} className="space-y-3">
+                        <h3 className="text-lg font-semibold">
+                          {sector.sector_name} - {SECTOR_NAME[sector.sector_number as number] ?? `Sektor ${sector.sector_number}`}
+                        </h3>
+                        {sector.participants.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Belum ada peserta</p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                            {sector.participants.map((participant) => (
+                              <Card key={participant.id} className="hover:shadow-md transition-shadow">
+                                <CardContent className="p-3 md:p-4">
+                                  <div className="space-y-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <h4 className="font-medium text-sm sm:text-base truncate">{participant.nama_lengkap}</h4>
+                                      <Badge variant="outline" className="text-xs shrink-0">Sektor {participant.sektor}</Badge>
+                                    </div>
+                                    {participant.nim && (
+                                      <p className="text-xs sm:text-sm text-muted-foreground">NIM: {participant.nim}</p>
+                                    )}
+                                    {participant.email && (
+                                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{participant.email}</p>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                      <Badge className={`${getRoleBadgeStyle(participant.role)} text-xs`}>
+                                        {getRoleDisplay(participant.role)}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                ))}
+                    ))
+                  } else {
+                    // Show only selected sector
+                    const sectorNumber = parseInt(selectedSectorParticipants)
+                    const sector = sectors.find((s) => s.sector_number === sectorNumber)
+                    
+                    if (!sector) {
+                      return (
+                        <div className="text-center py-12">
+                          <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                          <h3 className="text-lg font-semibold mb-2">Sektor Tidak Ditemukan</h3>
+                          <p className="text-muted-foreground">
+                            Sektor {sectorNumber} tidak ditemukan dalam sistem
+                          </p>
+                        </div>
+                      )
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-semibold">
+                          {sector.sector_name} - {SECTOR_NAME[sector.sector_number as number] ?? `Sektor ${sector.sector_number}`}
+                        </h3>
+                        {sector.participants.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Belum ada peserta</p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                            {sector.participants.map((participant) => (
+                              <Card key={participant.id} className="hover:shadow-md transition-shadow">
+                                <CardContent className="p-3 md:p-4">
+                                  <div className="space-y-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <h4 className="font-medium text-sm sm:text-base truncate">{participant.nama_lengkap}</h4>
+                                      <Badge variant="outline" className="text-xs shrink-0">Sektor {participant.sektor}</Badge>
+                                    </div>
+                                    {participant.nim && (
+                                      <p className="text-xs sm:text-sm text-muted-foreground">NIM: {participant.nim}</p>
+                                    )}
+                                    {participant.email && (
+                                      <p className="text-xs sm:text-sm text-muted-foreground truncate">{participant.email}</p>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                      <Badge className={`${getRoleBadgeStyle(participant.role)} text-xs`}>
+                                        {getRoleDisplay(participant.role)}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                })()}
               </div>
             </CardContent>
           </Card>
