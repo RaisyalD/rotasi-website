@@ -408,7 +408,7 @@ export function PesertaDashboard({ user }: { user: User }) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Tugas</CardTitle>
@@ -437,13 +437,13 @@ export function PesertaDashboard({ user }: { user: User }) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Mentor</CardTitle>
             <GraduationCap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg font-semibold">
+            <div className="text-lg font-semibold truncate">
               {mentor ? mentor.nama_lengkap : 'Belum ditentukan'}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -457,16 +457,16 @@ export function PesertaDashboard({ user }: { user: User }) {
       {/* Tasks and Submissions */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="tasks">Daftar Tugas</TabsTrigger>
-          <TabsTrigger value="submissions">Submission Saya</TabsTrigger>
+          <TabsTrigger value="tasks" className="text-xs sm:text-sm">Daftar Tugas</TabsTrigger>
+          <TabsTrigger value="submissions" className="text-xs sm:text-sm">Submission Saya</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tasks" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <FileText className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">Tugas Sektor {user.sektor} : {SECTOR_NAME[user.sektor as number] ?? `Sektor ${user.sektor}`}</span>
               </CardTitle>
               <CardDescription>
                 Daftar tugas yang harus dikumpulkan
@@ -480,16 +480,16 @@ export function PesertaDashboard({ user }: { user: User }) {
                   
                   return (
                     <div key={task.id} className="border rounded-lg p-4 bg-card">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
                           {getTaskStatusIcon(taskStatus)}
-                          <h3 className="font-semibold">{task.title}</h3>
+                          <h3 className="font-semibold min-w-0 flex-1">{task.title}</h3>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">
+                        <div className="flex items-center gap-2 flex-wrap flex-shrink-0">
+                          <Badge variant="outline" className="text-xs">
                             Sektor {task.sector}
                           </Badge>
-                          <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
+                          <Badge className={`${getTaskTypeBadgeStyle(task.task_type)} text-xs`}>{getTaskTypeDisplay(task.task_type)}</Badge>
                         </div>
                       </div>
                       
@@ -523,16 +523,19 @@ export function PesertaDashboard({ user }: { user: User }) {
                         )}
                       </div>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Deadline: {formatDateTime(task.due_date)}</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4 flex-shrink-0" />
+                            <span className="truncate">Deadline: {formatDateTime(task.due_date)}</span>
+                          </span>
                           {(() => {
                             const submission = submissions.find(sub => sub.task_id === task.id)
                             if (submission) {
                               // Jika sudah submit, cek apakah submit terlambat
                               if (isSubmissionLate(task, submission.submitted_at)) {
                                 return (
-                                  <Badge variant="destructive">Terlambat</Badge>
+                                  <Badge variant="destructive" className="text-xs">Terlambat</Badge>
                                 )
                               }
                             } else {
@@ -541,7 +544,7 @@ export function PesertaDashboard({ user }: { user: User }) {
                               const deadline = new Date(task.due_date)
                               if (now.getTime() > deadline.getTime()) {
                                 return (
-                                  <Badge variant="destructive">Terlambat</Badge>
+                                  <Badge variant="destructive" className="text-xs">Terlambat</Badge>
                                 )
                               }
                             }
@@ -557,9 +560,11 @@ export function PesertaDashboard({ user }: { user: User }) {
                                 setSelectedTask(task)
                                 setUploadDialog(true)
                               }}
+                              className="w-full sm:w-auto min-h-[44px]"
                             >
                               <Upload className="h-3 w-3 mr-1" />
-                              Upload Tugas
+                              <span className="hidden sm:inline">Upload Tugas</span>
+                              <span className="sm:hidden">Upload</span>
                             </Button>
                           ) : (
                             <Button 
@@ -575,9 +580,11 @@ export function PesertaDashboard({ user }: { user: User }) {
                                 })
                                 setUploadDialog(true)
                               }}
+                              className="w-full sm:w-auto min-h-[44px]"
                             >
                               <Edit className="h-3 w-3 mr-1" />
-                              Edit Tugas
+                              <span className="hidden sm:inline">Edit Tugas</span>
+                              <span className="sm:hidden">Edit</span>
                             </Button>
                           )}
                         </div>
@@ -593,9 +600,9 @@ export function PesertaDashboard({ user }: { user: User }) {
         <TabsContent value="submissions" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5" />
-                Submission Tugas Saya
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Upload className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">Submission Tugas Saya</span>
               </CardTitle>
               <CardDescription>
                 Riwayat pengumpulan tugas
@@ -604,32 +611,34 @@ export function PesertaDashboard({ user }: { user: User }) {
             <CardContent>
               <div className="space-y-4">
                 {submissions.map((submission) => (
-                  <div key={submission.id} className="border rounded-lg p-4 bg-card">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <h3 className="font-semibold">{submission.tasks.title}</h3>
-                        <p className="text-sm text-muted-foreground">
+                  <div key={submission.id} className="border rounded-lg p-4 bg-card overflow-hidden">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold break-words">{submission.tasks.title}</h3>
+                        <p className="text-sm text-muted-foreground break-words">
                           Sektor {submission.tasks.sector} • {new Date(submission.submitted_at).toLocaleDateString('id-ID')}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         {isSubmissionLate(submission.tasks, submission.submitted_at) && (
-                          <Badge variant="destructive">Terlambat</Badge>
+                          <Badge variant="destructive" className="text-xs">Terlambat</Badge>
                         )}
                       </div>
                     </div>
                     
                     {submission.submission_text && (
-                      <div className="bg-gray-800 p-3 rounded mb-3">
-                        <p className="text-sm">{submission.submission_text}</p>
+                      <div className="bg-gray-800 p-3 rounded mb-3 overflow-hidden">
+                        <p className="text-sm break-all whitespace-pre-wrap overflow-hidden">{submission.submission_text}</p>
                       </div>
                     )}
                     
                     {submission.file_url && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{submission.file_name}</span>
-                        <Button size="sm" variant="outline" asChild>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+                          <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm break-all overflow-hidden">{submission.file_name}</span>
+                        </div>
+                        <Button size="sm" variant="outline" asChild className="flex-shrink-0 w-full sm:w-auto">
                           <a href={submission.file_url} target="_blank" rel="noopener noreferrer">
                             <Download className="h-3 w-3 mr-1" />
                             Download

@@ -430,7 +430,7 @@ export function MentorDashboard({ user }: { user: User }) {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Mentee</CardTitle>
@@ -457,7 +457,7 @@ export function MentorDashboard({ user }: { user: User }) {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Submission Dikumpulkan</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
@@ -511,8 +511,8 @@ export function MentorDashboard({ user }: { user: User }) {
                     return (
                       <div key={task.id} className="border rounded-lg p-4 bg-card">
                         <div className="mb-3">
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="font-semibold text-lg flex-1 pr-2">{task.title}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
+                            <h3 className="font-semibold text-lg flex-1 min-w-0">{task.title}</h3>
                             <Button 
                               size="sm" 
                               variant="outline"
@@ -520,15 +520,16 @@ export function MentorDashboard({ user }: { user: User }) {
                                 setSelectedTask(task)
                                 setTaskDetailDialog(true)
                               }}
-                              className="flex-shrink-0"
+                              className="flex-shrink-0 w-full sm:w-auto"
                             >
                               <Eye className="h-4 w-4 sm:mr-2" />
                               <span className="hidden sm:inline">Detail</span>
+                              <span className="sm:hidden">Lihat Detail</span>
                             </Button>
                           </div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Badge variant="outline">Sektor {task.sector}</Badge>
-                            <Badge className={getTaskTypeBadgeStyle(task.task_type)}>{getTaskTypeDisplay(task.task_type)}</Badge>
+                          <div className="flex items-center gap-2 mb-3 flex-wrap">
+                            <Badge variant="outline" className="text-xs">Sektor {task.sector}</Badge>
+                            <Badge className={`${getTaskTypeBadgeStyle(task.task_type)} text-xs`}>{getTaskTypeDisplay(task.task_type)}</Badge>
                           </div>
                             <div className="mb-3">
                               {task.description.length > 100 ? (
@@ -647,12 +648,12 @@ export function MentorDashboard({ user }: { user: User }) {
                     Lihat semua submission tugas dari mentee • Total: {submissions.length} submission
                   </CardDescription>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     size="sm"
                     onClick={() => handleBulkDownload('all')}
                     disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <DownloadCloud className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Download Semua</span>
@@ -663,7 +664,7 @@ export function MentorDashboard({ user }: { user: User }) {
                     variant="outline"
                     onClick={() => handleBulkDownload('select-tasks')}
                     disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <Archive className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Download per Tugas</span>

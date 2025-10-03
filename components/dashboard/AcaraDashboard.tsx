@@ -836,7 +836,7 @@ export function AcaraDashboard() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Sektor</CardTitle>
@@ -863,7 +863,7 @@ export function AcaraDashboard() {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Submission</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -881,25 +881,25 @@ export function AcaraDashboard() {
       {/* Main Content */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="tasks">Kelola Tugas</TabsTrigger>
-          <TabsTrigger value="submissions">Semua Submission</TabsTrigger>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks" className="text-xs sm:text-sm">Kelola Tugas</TabsTrigger>
+          <TabsTrigger value="submissions" className="text-xs sm:text-sm">Semua Submission</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tasks" className="space-y-6">
           {/* Create Task */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Buat Tugas Baru (Semua Sektor)
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">Buat Tugas Baru (Semua Sektor)</span>
               </CardTitle>
               <CardDescription>
                 Tugas akan dibuat untuk semua sektor secara otomatis
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="task-title">Judul Tugas</Label>
                   <Input
@@ -909,7 +909,7 @@ export function AcaraDashboard() {
                     placeholder="Masukkan judul tugas"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <Label htmlFor="task-due-date">Deadline Tanggal</Label>
                     <Input
@@ -968,18 +968,20 @@ export function AcaraDashboard() {
               </div>
               <Button 
                 onClick={handleCreateTask} 
-                className="w-full"
+                className="w-full min-h-[44px]"
                 disabled={isCreatingTask}
               >
                 {isCreatingTask ? (
                   <>
                     <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Membuat Tugas...
+                    <span className="hidden sm:inline">Membuat Tugas...</span>
+                    <span className="sm:hidden">Membuat...</span>
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4 mr-2" />
-                    Buat Tugas
+                    <span className="hidden sm:inline">Buat Tugas</span>
+                    <span className="sm:hidden">Buat</span>
                   </>
                 )}
               </Button>
@@ -993,12 +995,12 @@ export function AcaraDashboard() {
                 <div>
                   <CardTitle>Daftar Tugas per Sektor</CardTitle>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     size="sm"
                     onClick={handleBulkEdit}
                     disabled={tasks.length === 0}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Edit Tugas</span>
@@ -1012,7 +1014,7 @@ export function AcaraDashboard() {
                       handleBulkDelete('all')
                     }}
                     disabled={tasks.length === 0}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Hapus Semua Tugas</span>
@@ -1091,10 +1093,10 @@ export function AcaraDashboard() {
                                   </p>
                                 )}
                               </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                                <Badge variant="secondary">Deadline: {formatDateTime(task.due_date)}</Badge>
-                            <Badge className={getTaskTypeBadgeStyle(task.task_type || 'individu')}>{getTaskTypeDisplay(task.task_type || 'individu')}</Badge>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="secondary" className="text-xs">Deadline: {formatDateTime(task.due_date)}</Badge>
+                            <Badge className={`${getTaskTypeBadgeStyle(task.task_type || 'individu')} text-xs`}>{getTaskTypeDisplay(task.task_type || 'individu')}</Badge>
                               </div>
                           <p className="text-xs text-muted-foreground">
                             Tugas dibuat untuk sektor 1-10
@@ -1116,12 +1118,12 @@ export function AcaraDashboard() {
                 <div>
                   <CardTitle>Submission Tugas Terstruktur per Sektor</CardTitle>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button
                     size="sm"
                     onClick={() => handleBulkDownload('all')}
                     disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <DownloadCloud className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Download Semua</span>
@@ -1132,7 +1134,7 @@ export function AcaraDashboard() {
                     variant="outline"
                     onClick={() => handleBulkDownload('select-tasks')}
                     disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 w-full sm:w-auto"
                   >
                     <Archive className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Download per Tugas</span>
@@ -1157,14 +1159,14 @@ export function AcaraDashboard() {
                         <div className="space-y-3">
                           {sectorSubs.map((submission) => (
                             <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
-                              <div className="flex items-center justify-between mb-3">
-                                <div>
-                                  <h3 className="font-semibold">{submission.participants.nama_lengkap}</h3>
-                                  <p className="text-sm text-muted-foreground">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-semibold truncate">{submission.participants.nama_lengkap}</h3>
+                                  <p className="text-sm text-muted-foreground truncate">
                                     {submission.tasks.title} • {new Date(submission.submitted_at).toLocaleString('id-ID')}
                                   </p>
                                   <div className="mt-1">
-                                    <Badge className={getTaskTypeBadgeStyle(submission.tasks.task_type || 'individu')}>
+                                    <Badge className={`${getTaskTypeBadgeStyle(submission.tasks.task_type || 'individu')} text-xs`}>
                                       {getTaskTypeDisplay(submission.tasks.task_type || 'individu')}
                                     </Badge>
                                   </div>
@@ -1205,10 +1207,12 @@ export function AcaraDashboard() {
                                 </div>
                               </div>
                               {submission.file_url && (
-                                <div className="flex items-center gap-2 mb-3">
-                                  <FileText className="h-4 w-4 text-muted-foreground" />
-                                  <span className="text-sm">{submission.file_name}</span>
-                                  <Button size="sm" variant="outline" asChild>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                    <span className="text-sm truncate">{submission.file_name}</span>
+                                  </div>
+                                  <Button size="sm" variant="outline" asChild className="flex-shrink-0 w-full sm:w-auto">
                                     <a href={submission.file_url} target="_blank" rel="noopener noreferrer">Download</a>
                                   </Button>
                                 </div>
@@ -1231,11 +1235,11 @@ export function AcaraDashboard() {
         </TabsContent>
         
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {sectors.map((sector) => (
               <Card key={sector.sector_number} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">{sector.sector_name}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg truncate">{sector.sector_name}</CardTitle>
                   <CardDescription>
                     Sektor {sector.sector_number}
                   </CardDescription>
@@ -1243,15 +1247,15 @@ export function AcaraDashboard() {
                 <CardContent className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Peserta:</span>
-                    <Badge variant="outline">{sector.participants.length}</Badge>
+                    <Badge variant="outline" className="text-xs">{sector.participants.length}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Mentor:</span>
-                    <Badge variant="outline">{sector.mentors.length}</Badge>
+                    <Badge variant="outline" className="text-xs">{sector.mentors.length}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Total:</span>
-                    <Badge variant="default">
+                    <Badge variant="default" className="text-xs">
                       {sector.participants.length + sector.mentors.length}
                     </Badge>
                   </div>
