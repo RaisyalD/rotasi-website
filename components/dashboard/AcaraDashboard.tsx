@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download, RefreshCw, DownloadCloud, Archive, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { Users, GraduationCap, Eye, Building2, UserCheck, Trash2, Edit, Plus, AlertTriangle, FileText, Download, RefreshCw, DownloadCloud, Archive, Clock, ChevronDown, ChevronUp, Filter } from 'lucide-react'
 import { SECTOR_NAME } from '@/lib/utils'
 import { User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
@@ -58,6 +58,7 @@ export function AcaraDashboard() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedSectorFilter, setSelectedSectorFilter] = useState<string>('all')
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [editTaskDialog, setEditTaskDialog] = useState(false)
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false)
@@ -1119,45 +1120,76 @@ export function AcaraDashboard() {
                   <CardTitle>Submission Tugas Terstruktur per Sektor</CardTitle>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => handleBulkDownload('all')}
-                    disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0 w-full sm:w-auto"
-                  >
-                    <DownloadCloud className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Download Semua</span>
-                    <span className="sm:hidden">Download Semua</span>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkDownload('select-tasks')}
-                    disabled={submissions.length === 0 || isDownloading}
-                    className="flex-shrink-0 w-full sm:w-auto"
-                  >
-                    <Archive className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Download per Tugas</span>
-                    <span className="sm:hidden">Download per Tugas</span>
-                  </Button>
+                  <div className="flex-1">
+                    <Select value={selectedSectorFilter} onValueChange={setSelectedSectorFilter}>
+                      <SelectTrigger className="w-full">
+                        <div className="flex items-center gap-2">
+                          <Filter className="h-4 w-4 text-muted-foreground" />
+                          <SelectValue placeholder="Pilih sektor">
+                            {selectedSectorFilter === 'all' ? 'Semua Sektor' : 
+                             sectors.find(s => s.sector_number.toString() === selectedSectorFilter)?.sector_name || 'Pilih sektor'}
+                          </SelectValue>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Semua Sektor</SelectItem>
+                        {sectors.map((sector) => (
+                          <SelectItem key={sector.sector_number} value={sector.sector_number.toString()}>
+                            {sector.sector_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => handleBulkDownload('all')}
+                      disabled={submissions.length === 0 || isDownloading}
+                      className="flex-shrink-0 w-full sm:w-auto"
+                    >
+                      <DownloadCloud className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Download Semua</span>
+                      <span className="sm:hidden">Download Semua</span>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleBulkDownload('select-tasks')}
+                      disabled={submissions.length === 0 || isDownloading}
+                      className="flex-shrink-0 w-full sm:w-auto"
+                    >
+                      <Archive className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">Download per Tugas</span>
+                      <span className="sm:hidden">Download per Tugas</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {[...Array(10)].map((_, idx) => {
-                  const sectorNumber = idx + 1
-                  const sectorSubs = submissions
-                    .filter((s) => s.tasks.sector === sectorNumber)
-                    .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                {(() => {
+                  // Determine which sectors to show based on filter
+                  const sectorsToShow = selectedSectorFilter === 'all' 
+                    ? [...Array(10)].map((_, idx) => idx + 1)
+                    : [parseInt(selectedSectorFilter)]
+
                   return (
-                    <div key={sectorNumber} className="space-y-3">
-                      <h3 className="text-lg font-semibold">Sektor {sectorNumber}</h3>
-                      {sectorSubs.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">Belum ada submission</p>
-                      ) : (
-                        <div className="space-y-3">
-                          {sectorSubs.map((submission) => (
+                    <>
+                      {sectorsToShow.map((sectorNumber) => {
+                        const sectorSubs = submissions
+                          .filter((s) => s.tasks.sector === sectorNumber)
+                          .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+                        
+                        return (
+                          <div key={sectorNumber} className="space-y-3">
+                            <h3 className="text-lg font-semibold">Sektor {sectorNumber}</h3>
+                            {sectorSubs.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">Belum ada submission</p>
+                            ) : (
+                              <div className="space-y-3">
+                                {sectorSubs.map((submission) => (
                             <div key={submission.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                                 <div className="flex-1 min-w-0">
@@ -1224,11 +1256,14 @@ export function AcaraDashboard() {
                               )}
                             </div>
                           ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                        )
+                      })}
+                    </>
                   )
-                })}
+                })()}
               </div>
             </CardContent>
           </Card>
