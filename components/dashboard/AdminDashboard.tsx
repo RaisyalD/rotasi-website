@@ -61,6 +61,9 @@ export function AdminDashboard() {
   // Sector filter state
   const [selectedSector, setSelectedSector] = useState<string>('none')
   const [selectedSectorParticipants, setSelectedSectorParticipants] = useState<string>('all')
+  
+  // Filter states
+  const [showLateOnly, setShowLateOnly] = useState(false)
 
   useEffect(() => {
     fetchAllData()
@@ -174,6 +177,7 @@ export function AdminDashboard() {
     })
   }
 
+  // Function to check if submission is late
   const isSubmissionLate = (task: Task, submittedAt: string) => {
     try {
       const submitted = new Date(submittedAt)
@@ -689,28 +693,43 @@ export function AdminDashboard() {
                 Semua Submission
               </CardTitle>
                   <CardDescription className="text-sm">
-                Submission tugas dari semua peserta termasuk status keterlambatan
-              </CardDescription>
+                    Submission tugas dari semua peserta termasuk status keterlambatan • Total: {submissions.length} submission
+                    {showLateOnly && (
+                      <span className="text-red-600"> • Menampilkan peserta terlambat</span>
+                    )}
+                  </CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-muted-foreground" />
-                  <Select value={selectedSector} onValueChange={setSelectedSector}>
-                    <SelectTrigger className="w-full sm:w-[200px] [&>span]:justify-start [&>span]:gap-0 [&>span]:text-left">
-                      <SelectValue placeholder="Pilih Sektor" />
-                    </SelectTrigger>
-                    <SelectContent position="popper" side="bottom" align="end" className="max-h-[200px] overflow-y-auto">
-                      <SelectItem value="none">Tidak memilih sektor</SelectItem>
-                      <SelectItem value="all">Semua Sektor</SelectItem>
-                      {[...Array(10)].map((_, idx) => {
-                        const sectorNumber = idx + 1
-                        return (
-                          <SelectItem key={sectorNumber} value={sectorNumber.toString()}>
-                            Sektor {sectorNumber} - {SECTOR_NAME[sectorNumber as number] ?? `Sektor ${sectorNumber}`}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={selectedSector} onValueChange={setSelectedSector}>
+                      <SelectTrigger className="w-full sm:w-[200px] [&>span]:justify-start [&>span]:gap-0 [&>span]:text-left">
+                        <SelectValue placeholder="Pilih Sektor" />
+                      </SelectTrigger>
+                      <SelectContent position="popper" side="bottom" align="end" className="max-h-[200px] overflow-y-auto">
+                        <SelectItem value="none">Tidak memilih sektor</SelectItem>
+                        <SelectItem value="all">Semua Sektor</SelectItem>
+                        {[...Array(10)].map((_, idx) => {
+                          const sectorNumber = idx + 1
+                          return (
+                            <SelectItem key={sectorNumber} value={sectorNumber.toString()}>
+                              Sektor {sectorNumber} - {SECTOR_NAME[sectorNumber as number] ?? `Sektor ${sectorNumber}`}
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant={showLateOnly ? "default" : "outline"}
+                    onClick={() => setShowLateOnly(!showLateOnly)}
+                    className="flex-shrink-0 w-full sm:w-auto"
+                  >
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">{showLateOnly ? 'Tampilkan Semua' : 'Tampilkan Peserta Terlambat'}</span>
+                    <span className="sm:hidden">{showLateOnly ? 'Semua' : 'Terlambat'}</span>
+                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -730,10 +749,14 @@ export function AdminDashboard() {
                     )
                   }
 
-                  // Filter submissions based on selected sector
-                  const filteredSubmissions = selectedSector === 'all' 
+                  // Filter submissions based on selected sector and late filter
+                  const filteredSubmissions = (selectedSector === 'all' 
                     ? submissions 
-                    : submissions.filter((s) => s.tasks.sector === parseInt(selectedSector))
+                    : submissions.filter((s) => s.tasks.sector === parseInt(selectedSector)))
+                    .filter(submission => {
+                      if (!showLateOnly) return true
+                      return isSubmissionLate(submission.tasks, submission.submitted_at)
+                    })
                   
                   // Group by sector
                   const groupedSubmissions = filteredSubmissions.reduce((acc, submission) => {

@@ -58,7 +58,7 @@ export function AcaraDashboard() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [submissions, setSubmissions] = useState<TaskSubmission[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedSectorFilter, setSelectedSectorFilter] = useState<string>('all')
+  const [selectedSectorFilter, setSelectedSectorFilter] = useState<string>('none')
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [editTaskDialog, setEditTaskDialog] = useState(false)
   const [bulkDeleteDialog, setBulkDeleteDialog] = useState(false)
@@ -596,8 +596,7 @@ export function AcaraDashboard() {
       for (let i = 0; i < submissionsWithFiles.length; i++) {
         const submission = submissionsWithFiles[i]
         try {
-          const originalFileName = submission.file_name || 'unknown_file'
-          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${originalFileName}`
+          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${submission.tasks.title.replace(/[^a-zA-Z0-9]/g, '_')}`
           await downloadFile(submission.file_url!, sanitizedFileName)
           successCount++
           
@@ -653,8 +652,7 @@ export function AcaraDashboard() {
       for (let i = 0; i < submissionsWithFiles.length; i++) {
         const submission = submissionsWithFiles[i]
         try {
-          const originalFileName = submission.file_name || 'unknown_file'
-          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${originalFileName}`
+          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${submission.tasks.title.replace(/[^a-zA-Z0-9]/g, '_')}`
           await downloadFile(submission.file_url!, sanitizedFileName)
           successCount++
           
@@ -1052,16 +1050,17 @@ export function AcaraDashboard() {
                         description: task.description,
                         due_date: task.due_date,
                         task_type: task.task_type,
+                        created_at: task.created_at,
                         sectors: new Set<number>()
                       }
                     }
                     acc[key].sectors.add(task.sector)
                     return acc
-                  }, {} as Record<string, { title: string; description: string; due_date: string; task_type: string; sectors: Set<number> }>)
+                  }, {} as Record<string, { title: string; description: string; due_date: string; task_type: string; created_at: string; sectors: Set<number> }>)
 
-                  // Convert to array and sort by due_date
+                  // Convert to array and sort by created_at (newest first)
                   const uniqueTasks = Object.values(groupedTasks)
-                    .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
                   return uniqueTasks.map((task, index) => (
                     <div key={index} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
@@ -1128,12 +1127,14 @@ export function AcaraDashboard() {
                         <div className="flex items-center gap-2">
                           <Filter className="h-4 w-4 text-muted-foreground" />
                           <SelectValue placeholder="Pilih sektor">
-                            {selectedSectorFilter === 'all' ? 'Semua Sektor' : 
+                            {selectedSectorFilter === 'none' ? 'Tidak memilih sektor' :
+                             selectedSectorFilter === 'all' ? 'Semua Sektor' : 
                              sectors.find(s => s.sector_number.toString() === selectedSectorFilter)?.sector_name || 'Pilih sektor'}
                           </SelectValue>
                         </div>
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-[200px] overflow-y-auto" position="popper" side="bottom" align="start">
+                        <SelectItem value="none">Tidak memilih sektor</SelectItem>
                         <SelectItem value="all">Semua Sektor</SelectItem>
                         {sectors.map((sector) => (
                           <SelectItem key={sector.sector_number} value={sector.sector_number.toString()}>
@@ -1172,6 +1173,17 @@ export function AcaraDashboard() {
             <CardContent>
               <div className="space-y-6">
                 {(() => {
+                  // Show placeholder when no sector is selected
+                  if (selectedSectorFilter === 'none') {
+                    return (
+                      <div className="text-center py-12">
+                        <Filter className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground text-lg">Pilih sektor untuk menampilkan hasil</p>
+                        <p className="text-sm text-muted-foreground mt-2">Gunakan dropdown di atas untuk memilih sektor yang ingin dilihat</p>
+                      </div>
+                    )
+                  }
+
                   // Determine which sectors to show based on filter
                   const sectorsToShow = selectedSectorFilter === 'all' 
                     ? [...Array(10)].map((_, idx) => idx + 1)

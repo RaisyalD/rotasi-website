@@ -59,6 +59,9 @@ export function MentorDashboard({ user }: { user: User }) {
   
   // Expandable description states
   const [expandedDescriptions, setExpandedDescriptions] = useState<Set<string>>(new Set())
+  
+  // Filter states
+  const [showLateOnly, setShowLateOnly] = useState(false)
 
   useEffect(() => {
     fetchMentees()
@@ -205,6 +208,7 @@ export function MentorDashboard({ user }: { user: User }) {
   const getMenteeSubmissions = (menteeId: string) => {
     return submissions.filter(sub => sub.participant_id === menteeId)
   }
+
 
   // Bulk download functions
   const downloadFile = async (url: string, filename: string) => {
@@ -467,26 +471,19 @@ export function MentorDashboard({ user }: { user: User }) {
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
               {(() => {
-                const overdueTasks = tasks.filter(task => {
-                  const now = new Date()
-                  const deadline = new Date(task.due_date)
-                  return now.getTime() > deadline.getTime()
-                })
-
-                const overdueMentees = mentees.filter(mentee => {
-                  return overdueTasks.some(task => {
-                    const hasSubmission = submissions.some(sub => 
-                      sub.participant_id === mentee.id && sub.task_id === task.id
-                    )
-                    return !hasSubmission
-                  })
-                })
-
-                return overdueMentees.length
+                // Count mentees who have late submissions
+                const lateSubmissions = submissions.filter(submission => 
+                  isSubmissionLate(submission.tasks, submission.submitted_at)
+                )
+                
+                // Get unique mentees who have late submissions
+                const lateMenteeIds = new Set(lateSubmissions.map(sub => sub.participant_id))
+                
+                return lateMenteeIds.size
               })()}
             </div>
             <p className="text-xs text-muted-foreground">
-              belum mengumpulkan
+              terlambat mengumpulkan
             </p>
           </CardContent>
         </Card>
@@ -510,11 +507,10 @@ export function MentorDashboard({ user }: { user: User }) {
 
       {/* Mentees, Tasks, and Submissions */}
       <Tabs defaultValue="tasks" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="tasks" className="text-xs sm:text-sm">Tugas Sektor</TabsTrigger>
           <TabsTrigger value="mentees" className="text-xs sm:text-sm">Daftar Mentee</TabsTrigger>
           <TabsTrigger value="submissions" className="text-xs sm:text-sm">Submission Tugas</TabsTrigger>
-          <TabsTrigger value="overdue" className="text-xs sm:text-sm">Penugasan Terlambat</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tasks" className="space-y-4">
@@ -681,9 +677,22 @@ export function MentorDashboard({ user }: { user: User }) {
                   </CardTitle>
                   <CardDescription>
                     Lihat semua submission tugas dari mentee • Total: {submissions.length} submission
+                    {showLateOnly && (
+                      <span className="text-red-600"> • Menampilkan: {submissions.filter(submission => isSubmissionLate(submission.tasks, submission.submitted_at)).length} terlambat</span>
+                    )}
                   </CardDescription>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
+                  <Button
+                    size="sm"
+                    variant={showLateOnly ? "default" : "outline"}
+                    onClick={() => setShowLateOnly(!showLateOnly)}
+                    className="flex-shrink-0 w-full sm:w-auto"
+                  >
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">{showLateOnly ? 'Tampilkan Semua' : 'Tampilkan Terlambat'}</span>
+                    <span className="sm:hidden">{showLateOnly ? 'Semua' : 'Terlambat'}</span>
+                  </Button>
                   <Button
                     size="sm"
                     onClick={() => handleBulkDownload('all')}
@@ -710,7 +719,12 @@ export function MentorDashboard({ user }: { user: User }) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {submissions.map((submission) => (
+                {submissions
+                  .filter(submission => {
+                    if (!showLateOnly) return true
+                    return isSubmissionLate(submission.tasks, submission.submitted_at)
+                  })
+                  .map((submission) => (
                   <div key={submission.id} className="border rounded-lg p-4 bg-card">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
                       <div className="flex-1 min-w-0">
@@ -769,90 +783,7 @@ export function MentorDashboard({ user }: { user: User }) {
                       </Button>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="overdue" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="truncate">Mentee yang Terlambat - Sektor {user.sektor}</span>
-              </CardTitle>
-              <CardDescription>
-                Daftar mentee yang belum mengumpulkan tugas yang sudah melewati deadline
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {(() => {
-                  // Get all tasks that are overdue
-                  const overdueTasks = tasks.filter(task => {
-                    const now = new Date()
-                    const deadline = new Date(task.due_date)
-                    return now.getTime() > deadline.getTime()
-                  })
-
-                  // Get all mentees who haven't submitted overdue tasks
-                  const overdueMentees = mentees.filter(mentee => {
-                    // Check if this mentee has any overdue tasks without submission
-                    return overdueTasks.some(task => {
-                      const hasSubmission = submissions.some(sub => 
-                        sub.participant_id === mentee.id && sub.task_id === task.id
-                      )
-                      return !hasSubmission
-                    })
-                  })
-
-                  if (overdueMentees.length === 0) {
-                    return (
-                      <div className="text-center py-8">
-                        <AlertTriangle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">Tidak ada mentee yang terlambat</p>
-                        <p className="text-sm text-muted-foreground mt-2">Semua mentee sudah mengumpulkan tugas tepat waktu</p>
-                      </div>
-                    )
-                  }
-
-                  return overdueMentees.map((mentee) => {
-                    // Get overdue tasks for this mentee
-                    const menteeOverdueTasks = overdueTasks.filter(task => {
-                      const hasSubmission = submissions.some(sub => 
-                        sub.participant_id === mentee.id && sub.task_id === task.id
-                      )
-                      return !hasSubmission
-                    })
-
-                    return (
-                      <div key={mentee.id} className="border rounded-lg p-4 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
-                              <span className="text-red-600 dark:text-red-300 font-semibold text-sm">
-                                {mentee.nama_lengkap.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-lg text-red-800 dark:text-red-200">{mentee.nama_lengkap}</h3>
-                              <p className="text-sm text-muted-foreground">{mentee.email}</p>
-                            </div>
-                          </div>
-                          <div className="flex flex-col sm:items-end gap-2">
-                            <Badge variant="destructive" className="text-xs">
-                              {menteeOverdueTasks.length} Tugas Terlambat
-                            </Badge>
-                            <div className="text-xs text-muted-foreground">
-                              {menteeOverdueTasks.map(task => task.title).join(', ')}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })
-                })()}
+                  ))}
               </div>
             </CardContent>
           </Card>
