@@ -247,7 +247,8 @@ export function MentorDashboard({ user }: { user: User }) {
       for (let i = 0; i < submissionsWithFiles.length; i++) {
         const submission = submissionsWithFiles[i]
         try {
-          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${submission.tasks.title.replace(/[^a-zA-Z0-9]/g, '_')}`
+          const originalFileName = submission.file_name || 'unknown_file'
+          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${originalFileName}`
           await downloadFile(submission.file_url!, sanitizedFileName)
           successCount++
           
@@ -303,7 +304,8 @@ export function MentorDashboard({ user }: { user: User }) {
       for (let i = 0; i < submissionsWithFiles.length; i++) {
         const submission = submissionsWithFiles[i]
         try {
-          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${submission.tasks.title.replace(/[^a-zA-Z0-9]/g, '_')}`
+          const originalFileName = submission.file_name || 'unknown_file'
+          const sanitizedFileName = `${submission.participants.nama_lengkap.replace(/[^a-zA-Z0-9]/g, '_')}_${submission.participants.nim || 'no_nim'}_${originalFileName}`
           await downloadFile(submission.file_url!, sanitizedFileName)
           successCount++
           
