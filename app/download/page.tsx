@@ -14,16 +14,16 @@ export default function DownloadPage() {
           <div className="text-center mb-16">
             
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
-              Download <span className="text-red-600 dark:text-red-400">MyRotasi</span>
+              ROTASI <span className="text-red-600 dark:text-red-400">DIGITAL/span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-              Aplikasi resmi ROTASI untuk perangkat Android. Mudah dan praktis, akses di mana saja dan kapan saja.
+              Aplikasi resmi ROTASI untuk perangkat Android dan Windows. Mudah dan praktis, akses di mana saja dan kapan saja.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg" asChild>
-                <a href="https://content.rotasipsti.id/app/peserta/MyROTASI.apk" download="MyROTASI.apk">
+                <a href="https://link.rotasipsti.id/rotasi-digital-app">
                 <Download className="h-5 w-5 mr-2" />
                 Download Sekarang
                 </a>
@@ -52,7 +52,7 @@ export default function DownloadPage() {
                             className="w-10 h-10"
                           />
                         </div>
-                        <h3 className="font-bold text-lg text-gray-900">MyRotasi</h3>
+                        <h3 className="font-bold text-lg text-gray-900">ROTASI DIGITAL</h3>
                         <p className="text-sm text-gray-600 mt-2">Akses ROTASI di genggaman Anda</p>
                       </div>
                     </div>
