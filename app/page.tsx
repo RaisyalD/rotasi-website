@@ -46,7 +46,7 @@ export default function Home() {
               style={{ animationDelay: "400ms" }}
             >
               <Button asChild size="lg" className="bg-maroon hover:bg-maroon-light">
-                <Link href="/auth/register-divisi">Daftar Sekarang</Link>
+                <Link href="https://link.rotasipsti.id/login-rotasi">Daftar Sekarang</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/tentang">Pelajari Lebih Lanjut</Link>
@@ -260,7 +260,7 @@ export default function Home() {
                 <Link href="https://www.instagram.com/rotasipsti/">Ikuti Instagram Kami</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-black border-white hover:bg-white hover:text-black dark:text-white dark:hover:text-maroon">
-                <Link href="/auth/register-divisi">Gabung Sebagai Peserta</Link>
+                <Link href="https://link.rotasipsti.id/login-rotasi">Gabung Sebagai Peserta</Link>
               </Button>
             </div>
           </div>
