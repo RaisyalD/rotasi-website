@@ -189,10 +189,10 @@ export function Navbar() {
                   </Button>
                   <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border/50 overflow-hidden z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                     <div className="py-1">
-                      <Link href="/auth/register-divisi?allow=1" className="block px-4 py-2 text-sm hover:bg-accent">
+                      <Link href="https://link.rotasipsti.id/login-rotasi" className="block px-4 py-2 text-sm hover:bg-accent">
                         Register
                       </Link>
-                      <Link href="/auth/login?allow=1" className="block px-4 py-2 text-sm hover:bg-accent">
+                      <Link href="https://link.rotasipsti.id/login-rotasi" className="block px-4 py-2 text-sm hover:bg-accent">
                         Login
                       </Link>
                     </div>
