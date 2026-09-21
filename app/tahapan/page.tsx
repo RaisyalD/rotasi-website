@@ -26,8 +26,8 @@ export default function TahapanPage() {
               {[
                 {
                   title: "Pra-ROTASI",
-                  date: "September 2025",
-                  location: "Online & Kampus UPI Purwakarta",
+                  date: "September 2026",
+                  location: "Kampus UPI Purwakarta",
                   duration: "1 minggu",
                   desc: "Tahap persiapan dan technical meeting sebelum kegiatan ROTASI dimulai.",
                   activities: [
@@ -40,7 +40,7 @@ export default function TahapanPage() {
                 },
                 {
                   title: "ROTASI Tahap I",
-                  date: "Oktober 2025",
+                  date: "Oktober 2026",
                   location: "Kampus UPI Purwakarta",
                   duration: "3 hari",
                   desc: "Tahap pertama ROTASI dilaksanakan di kampus UPI Purwakarta dengan fokus pada pengenalan lingkungan kampus dan program studi.",
@@ -54,7 +54,7 @@ export default function TahapanPage() {
                 },
                 {
                   title: "ROTASI Tahap II",
-                  date: "Oktober 2025",
+                  date: "Oktober 2026",
                   location: "Luar Kampus",
                   duration: "3 hari",
                   desc: "Tahap kedua ROTASI berupa kegiatan outbound di luar kampus untuk membangun kebersamaan dan solidaritas.",
@@ -68,7 +68,7 @@ export default function TahapanPage() {
                 },
                 {
                   title: "Pasca-ROTASI",
-                  date: "November 2025",
+                  date: "November 2026",
                   location: "Kampus UPI Purwakarta",
                   duration: "Berkelanjutan",
                   desc: "Tahap maintenance untuk menjaga keaktifan anggota muda (savior muda) dan pengenalan ke Bratvacode.",
