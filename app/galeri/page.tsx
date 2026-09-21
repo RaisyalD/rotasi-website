@@ -165,8 +165,8 @@ export default function GaleriPage() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/IMrdNpX2PT8?si=Dq8wS8e3nozrPV0V"
-                title="TEASER ROTASI 2025"
+                src="https://www.youtube.com/embed/oML752ckL-A?si=wE_4fy1_4Ang86__"
+                title="TEASER ROTASI 2026"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
