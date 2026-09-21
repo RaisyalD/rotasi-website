@@ -23,7 +23,7 @@ export default function DownloadPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg" asChild>
-                <a href="https://link.rotasipsti.id/rotasi-digital-app">
+                <a href="https://link.rotasipsti.id/rotasi-digital-app" download="MyROTASI.apk">
                 <Download className="h-5 w-5 mr-2" />
                 Download Sekarang
                 </a>
