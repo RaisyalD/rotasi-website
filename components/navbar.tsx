@@ -14,7 +14,7 @@ import { ModernThemeToggle } from "@/components/modern-theme-toggle"
 const navLinks = [
   { name: "Beranda", href: "/" },
   { name: "Tentang", href: "/tentang" },
-  { name: "Struktur", href: "/struktur" },
+  { name: "Struktur", href: "/" },
   { name: "Tahapan", href: "/tahapan" },
   { name: "Galeri", href: "/galeri" },
   { name: "Download", href: "/download" },
