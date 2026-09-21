@@ -60,8 +60,8 @@ export default function Home() {
       <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">MENUJU ROTASI OKTOBER 2025</h2>
-            <CountdownTimer targetDate="2025-10-01T00:00:00" />
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">MENUJU ROTASI OKTOBER 2026</h2>
+            <CountdownTimer targetDate="2026-10-03T00:00:00" />
             <p className="mt-8 text-muted-foreground">
               Persiapkan dirimu untuk menjadi bagian dari regenerasi PSTI UPI
             </p>
@@ -139,15 +139,15 @@ export default function Home() {
           <div className="max-w-3xl mx-auto">
             <div className="timeline-container">
               {[
-                { title: "Pra-ROTASI", date: "September 2025", desc: "Persiapan dan pengenalan awal" },
+                { title: "Pra-ROTASI", date: "September 2026", desc: "Persiapan dan pengenalan awal" },
                 {
                   title: "ROTASI Tahap I",
-                  date: "Oktober 2025",
+                  date: "Oktober 2026",
                   desc: "Pengenalan lingkungan kampus dan program studi",
                 },
                 {
                   title: "ROTASI Tahap II",
-                  date: "Oktober 2025",
+                  date: "Oktober 2026",
                   desc: "Pembentukan karakter dan nilai-nilai dasar",
                 },
               ].map((item, index) => (
